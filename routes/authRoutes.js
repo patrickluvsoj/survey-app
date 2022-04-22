@@ -23,7 +23,7 @@ module.exports = function authRoutes(app) {
 
     //testing if user information has been recognized
     app.get('/api/current_user', (req, res) => {
+        // This routes checks if passport has succesfully added the user Mongo model to req.user
         res.send(req.user);
     })
 }
-

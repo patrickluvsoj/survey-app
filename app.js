@@ -2,6 +2,7 @@ const express = require('express')
 const passport = require('passport')
 const cookie_session = require('cookie-session')
 const mongoose = require('mongoose')
+require('./models/User')
 
 const dev = require('./config/dev')
 require('./services/passport')
@@ -11,8 +12,6 @@ const app = express()
 
 mongoose.connect(dev.MONGO_URL)
 const db = mongoose.connection
-
-console.log(db)
 
 //adding cookie & passport middleware
 app.use(cookie_session({
