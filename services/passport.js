@@ -3,7 +3,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy
 const dev = require('../config/dev')
 
 const mongoose = require('mongoose')
-const UserSchema = mongoose.model('User')
+const UserSchema = mongoose.model('users')
 
 // Reference this to understand serialize & deserialize
 // https://stackoverflow.com/questions/29066348/passportjs-serializeuser-and-deserializeuser-execution-flow
