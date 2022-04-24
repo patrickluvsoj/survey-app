@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var UserSchema = new Schema({
-    user_id: {type: String, required: true},
+    user_id: String
 });
 
 //Export model

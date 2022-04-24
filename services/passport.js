@@ -19,7 +19,7 @@ passport.serializeUser( (user, done) => {
 passport.deserializeUser( async (id, done) => {
     if (mongoose.Types.ObjectId.isValid(id)) {
         const user = await UserSchema.findById(id)
-        done(err, user)
+        done(null, user)
     }
     // console.log(id)
 })
@@ -32,17 +32,20 @@ passport.use(
         clientSecret: dev.GOOGLE_SECRET,
         callbackURL: '/auth/google/redirect',
         proxy: true,
-    }, async (accessToken, refreshToken, profile, email, done) => {
-        console.log('refresh: ' + refreshToken)
-        console.log('access' + accessToken)
-        console.log('profile: ' + profile)            
+    }, async (accessToken, refreshToken, profile, done) => {
+        console.log('refresh token: ' + refreshToken)
+        console.log('access token: ' + accessToken)
+        console.log('profile: ' + profile)
+        console.log(`profile id: ${profile.id}`) 
         // Logic if user is new or existing
         const existingUser = await UserSchema.findOne({ user_id: profile.id })
+        console.log('checked for existing user')
         if (existingUser) {
             return done(null, existingUser)
         }
 
         const user = await new UserSchema({user_id: profile.id}).save()
+        console.log('created new user')
         done(null, user)
     }
 ))  
