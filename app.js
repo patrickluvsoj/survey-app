@@ -4,19 +4,17 @@ const cookie_session = require('cookie-session')
 const mongoose = require('mongoose')
 require('./models/User')
 
-const dev = require('./config/dev')
+const key = require('./config/keys')
 require('./services/passport')
-
 
 const app = express()
 
-mongoose.connect(dev.MONGO_URL)
-const db = mongoose.connection
+mongoose.connect(key.MONGO_URL)
 
 //adding cookie & passport middleware
 app.use(cookie_session({
   name: 'session',
-  keys: [dev.COOKIE_KEY],
+  keys: [key.COOKIE_KEY],
   maxAge: 30 * 24 * 60 * 60 * 1000,
   secret: true
 }))

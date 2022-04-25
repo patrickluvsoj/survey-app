@@ -1,6 +1,8 @@
 const passport = require('passport')
 const GoogleStrategy = require('passport-google-oauth20').Strategy
-const dev = require('../config/dev')
+const key = require('../config/keys')
+
+console.log(`Key client and Secret ${key.GOOGLE_CLIENT} AND ${key.GOOGLE_SECRET}`) 
 
 const mongoose = require('mongoose')
 const UserSchema = mongoose.model('users')
@@ -12,31 +14,34 @@ const UserSchema = mongoose.model('users')
 // Serialize the id as cookie and pass to browser
 passport.serializeUser( (user, done) => {
     // this is not the google profile id. This is the mongo record id OID
+    console.log('serialize cookie')
     done(null, user.id)
 })
 
 // take cookie that user gives us and deserialize to a user model in Mongo
 passport.deserializeUser( async (id, done) => {
+    console.log('de-serialize cookie')
     if (mongoose.Types.ObjectId.isValid(id)) {
         const user = await UserSchema.findById(id)
         done(null, user)
     }
-    // console.log(id)
 })
 
 
 //separate passport related functionality into a separate file later
 passport.use(
         new GoogleStrategy({
-        clientID: dev.GOOGLE_CLIENT,
-        clientSecret: dev.GOOGLE_SECRET,
+        clientID: key.GOOGLE_CLIENT,
+        clientSecret: key.GOOGLE_SECRET,
         callbackURL: '/auth/google/redirect',
         proxy: true,
     }, async (accessToken, refreshToken, profile, done) => {
-        console.log('refresh token: ' + refreshToken)
-        console.log('access token: ' + accessToken)
-        console.log('profile: ' + profile)
-        console.log(`profile id: ${profile.id}`) 
+        console.log('handle auth request')
+        // console.log('refresh token: ' + refreshToken)
+        // console.log('access token: ' + accessToken)
+        // console.log('profile: ' + profile)
+        // console.log(`profile id: ${profile.id}`) 
+
         // Logic if user is new or existing
         const existingUser = await UserSchema.findOne({ user_id: profile.id })
         console.log('checked for existing user')
