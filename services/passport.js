@@ -2,7 +2,7 @@ const passport = require('passport')
 const GoogleStrategy = require('passport-google-oauth20').Strategy
 const key = require('../config/keys')
 
-console.log(`Key client and Secret ${key.GOOGLE_CLIENT} AND ${key.GOOGLE_SECRET}`) 
+// console.log(`Key client and Secret ${key.GOOGLE_CLIENT} AND ${key.GOOGLE_SECRET}`) 
 
 const mongoose = require('mongoose')
 const UserSchema = mongoose.model('users')
@@ -53,4 +53,4 @@ passport.use(
         console.log('created new user')
         done(null, user)
     }
-))  
+))
