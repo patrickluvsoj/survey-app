@@ -25,7 +25,7 @@ app.use(passport.session())
 require('./routes/authRoutes')(app)
 
 //get port from env variable passed by Heroku or use local port
-const port =  process.env.PORT || 3000
+const port =  process.env.PORT || 5000
 
 app.get('/', (req, res) => {
   res.send('Hello World!')

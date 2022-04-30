@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js",
+    "start": "concurrently \"node app.js\" \"npm start --prefix ./client\"",
     "stage": "nodemon app.js"
   },
   "keywords": [
@@ -17,8 +17,10 @@
   "author": "patrickluvsoj",
   "license": "MIT",
   "dependencies": {
+    "concurrently": "^7.1.0",
     "cookie-session": "^2.0.0",
     "express": "^4.17.3",
+    "http-proxy-middleware": "^2.0.6",
     "mongoose": "^6.2.10",
     "nodemon": "^2.0.15",
     "passport": "^0.5.2",
