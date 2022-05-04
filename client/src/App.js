@@ -1,9 +1,15 @@
+import { Routes, Route, Link } from "react-router-dom"
+import Landing from "./Landing"
+import Thread from "./Thread"
 
 function App() {
   return (
     <div className="App">
-      Hello!
-      <a href="/auth/google">Login</a>
+      <Routes>
+        <Route path='/' element={<Landing />}>
+          <Route path='threads' element={<Thread />}/>
+        </Route>
+      </Routes>
     </div>
   );
 }
