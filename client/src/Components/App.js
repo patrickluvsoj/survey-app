@@ -1,8 +1,12 @@
-import { Routes, Route, Link } from "react-router-dom"
+import { useEffect } from "react";
+import { Routes, Route } from "react-router-dom"
+import { useRecoilValueLoadable } from "recoil";
+import { fetchLoginState } from "../Services/fetchLoginState";
 import Landing from "./Landing"
 import Thread from "./Thread"
 
 function App() {
+
   return (
     <div className="App">
       <Routes>
