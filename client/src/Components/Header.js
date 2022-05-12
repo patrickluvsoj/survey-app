@@ -13,7 +13,7 @@ function Header() {
     })
 
     return (
-        <di>
+        <div>
             <nav>
                 <div className="nav-wrapper">
                     <a className="brand-logo" href="/">Home</a>
