@@ -17,7 +17,7 @@ function Header() {
             <nav>
                 <div className="nav-wrapper">
                     <a className="brand-logo" href="/">Home</a>
-                    <ul id="nav-mobile" class="right hide-on-med-and-down">
+                    <ul id="nav-mobile" className="right hide-on-med-and-down">
                         <li>{contents ? "Logout" : "Login"}</li>
                     </ul>
                 </div>

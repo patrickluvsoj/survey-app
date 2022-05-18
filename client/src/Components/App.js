@@ -1,7 +1,4 @@
-import { useEffect } from "react";
 import { Routes, Route } from "react-router-dom"
-import { useRecoilValueLoadable } from "recoil";
-import { fetchLoginState } from "../Services/fetchLoginState";
 import Header from "./Header"
 import Thread from "./Thread"
 import SurveyList from "./SurveyList"
@@ -9,7 +6,6 @@ import SurveyList from "./SurveyList"
 const NewSurvey = () => <div>NewSurvey</div>
 
 function App() {
-
   return (
     <div className="App">
       <Routes>

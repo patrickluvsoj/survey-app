@@ -17,7 +17,3 @@ export const fetchLoginState = selector({
         }
     }
 })
-
-
-// 1. Create fetchLoginState with selector
-// 2. call w/ useRecoilValueloadable()
