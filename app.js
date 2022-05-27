@@ -23,6 +23,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 require('./routes/authRoutes')(app)
+require('./routes/billingRoutes')(app)
 
 //get port from env variable passed by Heroku or use local port
 const port =  process.env.PORT || 5000
