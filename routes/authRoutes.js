@@ -12,7 +12,6 @@ module.exports = function authRoutes(app) {
     })
 
     app.get('/logout', (req, res) => {
-        console.log('dummy logout route')
         req.logout()
         res.redirect('/')
     })

@@ -17,6 +17,7 @@
   "author": "patrickluvsoj",
   "license": "MIT",
   "dependencies": {
+    "axios": "^0.27.2",
     "concurrently": "^7.1.0",
     "cookie-session": "^2.0.0",
     "express": "^4.17.3",
@@ -25,6 +26,7 @@
     "nodemon": "^2.0.15",
     "passport": "^0.5.2",
     "passport-google-oauth20": "^2.0.0",
+    "socket.io": "^4.5.1",
     "stripe": "^9.1.0"
   }
 }

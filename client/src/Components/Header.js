@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { useRecoilValueLoadable } from "recoil";
-import { fetchLoginState } from "../Services/fetchLoginState";
+
+
+import { fetchUserState } from "../Services/fetchUserState";
 import Payment from "./Payment";
+
 
 const Message = ({ message }) => (
     <section>
@@ -12,11 +15,11 @@ const Message = ({ message }) => (
 
 function Header() {
     // Check if user is logged in to decide on what content to show
-    const isLoggedIn = useRecoilValueLoadable(fetchLoginState);
-    const { contents } = isLoggedIn;
-    
+    const response = useRecoilValueLoadable(fetchUserState);
+    const { contents } = response;
+     
     useEffect(() => {
-        console.log("This is it: \n" + contents)
+        console.log(`User id: ${contents.user_id} and credits ${contents.credits}`)
     })
 
 
@@ -27,13 +30,11 @@ function Header() {
         const query = new URLSearchParams(window.location.search);
 
         if (query.get("success")) {
-          setMessage("Order placed!");
+          setMessage("Success");
         }
     
         if (query.get("canceled")) {
-          setMessage(
-            "Order canceled!"
-          );
+          setMessage("Canceled!");
         }
     }, [])
 
@@ -50,7 +51,7 @@ function Header() {
                         <li>
                             {renderMessageOrPayment(message)}
                         </li>
-                        <li>{contents ? "Logout" : "Login"}</li>
+                        <li>{contents.user_id ? "Logout" : "Login"}</li>
                     </ul>
                 </div>
             </nav>
