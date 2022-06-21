@@ -38,7 +38,7 @@ app.listen(port, () => {
 
 
 // TODO
-// Create a user mode with id, email and cookie
+// Create a user model with id, email and cookie
 // Check if user is in DB if YES, get cookie and deserialize
 // IF user doesn not exist, serialize and store cookie
 
