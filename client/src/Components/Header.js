@@ -20,9 +20,10 @@ function Header() {
      
     useEffect(() => {
         console.log(`User id: ${contents.user_id} and credits ${contents.credits}`)
-    })
+        setCredits(contents.credits)
+    }, [contents.credits, contents.user_id])
 
-
+    const [credits, setCredits] = useState(contents.credits)
     const [message, setMessage] = useState("")
 
     // Check to see if this is a redirect back from Checkout
@@ -49,6 +50,9 @@ function Header() {
                 <div className="nav-wrapper">
                     <a className="brand-logo" href="/">Home</a>
                     <ul id="nav-mobile" className="right hide-on-med-and-down">
+                        <li>
+                            {credits}
+                        </li>
                         <li>
                             {renderMessageOrPayment(message)}
                         </li>

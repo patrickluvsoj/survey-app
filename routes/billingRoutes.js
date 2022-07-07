@@ -7,12 +7,13 @@ const UserSchema = mongoose.model('users')
 
 const endpointSecret = keys.ENDPOINT_SECRET;
 
-
 const requireLogin = require('../middleware/requireLogin');
 
-module.exports = function billingRoutes(app) {
-    app.post('/api/checkout', async (req, res, requireLogin) => {
-      console.log(req.user)
+
+
+module.exports = function billingRoutes(app, io) {
+
+    app.post('/api/checkout', requireLogin, async (req, res) => {
         
         const session = await stripe.checkout.sessions.create({
           line_items: [
@@ -29,26 +30,27 @@ module.exports = function billingRoutes(app) {
           cancel_url: 'http://localhost:3000/?canceled=true',
         });
         
-        console.log(`stripe check out created for: ${JSON.stringify(session)}`)
+        console.log(`stripe check out created for: ${JSON.stringify(session.metadata)}`)
 
         res.redirect(303, session.url);
     }); 
 
     const fulfillOrder = async (session) => {
-        // TODO: fill me in
-        // console.log("Fulfilling order", session);
-        console.log(`Fullfull order for: ${session.metadata.user}`)
+        console.log(`Fullfill order for: ${session.metadata.user}`)
+        
         
         const user = JSON.parse(session.metadata.user);
-
-        console.log(user._id)
 
         if (mongoose.Types.ObjectId.isValid(user._id)) {
           const mongoUsr = await UserSchema.findById(user._id);
 
           mongoUsr.credits += 5;
           const updatedUser = await mongoUsr.save();
-          console.log(updatedUser) 
+          console.log(`updated order in mongoDB: ${updatedUser}`) 
+
+          // Broadcast event to client
+          io.to(user._id).emit("monogoDB updated");
+
         } else {
           console.log("cannot find user in Mongo")
         }

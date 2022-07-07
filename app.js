@@ -6,22 +6,6 @@ const key = require('./config/keys')
 
 const app = express()
 
-const http = require('http');
-const { Server } = require("socket.io");
-
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: 'http://localhost:3000',
-    methods: ["GET", "POST"],
-  }
-});
-
-require('./models/User')
-require('./services/passport')
-
-mongoose.connect(key.MONGO_URL)
-
 //adding cookie & passport middleware 
 const sessionMiddleware = cookie_session({
   name: 'session',
@@ -30,45 +14,58 @@ const sessionMiddleware = cookie_session({
   secret: true
 })
 
+require('./models/User')
+require('./services/passport')
+
+mongoose.connect(key.MONGO_URL)
+
 app.use(sessionMiddleware)
 app.use(passport.initialize())
 app.use(passport.session())
 
-require('./routes/authRoutes')(app)
-require('./routes/billingRoutes')(app)
+const http = require('http');
+const { Server } = require("socket.io");
 
-//get port from env variable passed by Heroku or use local port
-const port =  process.env.PORT || 5000
-
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
-
-server.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:3000',
+    methods: ["GET", "POST"],
+    credentials: true,
+  }
+});
 
 // define a wrapper to wrap express middleware to socket middleware
 const wrap = middleware => (socket, next) => middleware(socket.request, {}, next);
 
 io.use(wrap(sessionMiddleware));
 io.use(wrap(passport.initialize()));
-io.use(wrap(passport.session()));
+io.use(wrap(passport.session()));   
 
-io.on('connection', (socket) => {
-  console.log(`New connection established: ${socket.request.session}`);
+//get port from env variable passed by Heroku or use local port
+const port =  process.env.PORT || 5000
 
-  socket.on('whoami', (cb) => {
-    console.log(`user is: ${socket.request.user}`);
-  });
-  // try {
-  //   console.log(`connected ${JSON.stringify(socket.request)}`);
-  // } catch (error) {
-  //   console.error(error);
-  // }
+// app.get('/', (req, res) => {
+//   res.send('Hello World!')
+// })
+
+server.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
+
+const requireSocketLogin = require('./middleware/requireSocketLogin');
+  
+io.on('connection', requireSocketLogin, (socket) => {
+  const userId = socket.request.session.passport.user;
+
+  console.log(`New connection established: ${userId}`);
+  
+  socket.join(userId);
+  console.log(`socket has joined following room: ${JSON.stringify(socket.rooms)}`)
 }); 
 
-
+require('./routes/authRoutes')(app)
+require('./routes/billingRoutes')(app, io)
 
 
 // TODO

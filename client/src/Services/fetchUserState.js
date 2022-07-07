@@ -5,9 +5,9 @@ export const fetchUserState = selector({
     key: 'userStateSelector',
     get: async ({get}) => {
         try {
-            await new Promise(resolve => {
-                setTimeout(resolve, 3000)
-            })
+            // await new Promise(resolve => {
+            //     setTimeout(resolve, 3000)
+            // })
             
             const response = await axios.get("/api/current_user")
 

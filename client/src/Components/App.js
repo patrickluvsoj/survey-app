@@ -12,9 +12,11 @@ const NewSurvey = () => <div>NewSurvey</div>
 function App() {
 
   useEffect(() => {
-    const socket = io(ENDPOINT);
-    socket.on("connection", data => {
-      console.log('attemp connection')
+    const socket = io(ENDPOINT, {
+      withCredentials: true,
+    });
+    socket.onAny((event, ...args) => {
+      console.log(event, args);
     });
   }, []);
 
