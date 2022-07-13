@@ -24,7 +24,6 @@ module.exports = function billingRoutes(app, io) {
             },
           ],
           metadata: {'user': JSON.stringify(req.user)},
-          client_reference_id: 'hello',
           mode: 'payment',
           success_url: 'http://localhost:3000/?success=true',
           cancel_url: 'http://localhost:3000/?canceled=true',
@@ -37,7 +36,6 @@ module.exports = function billingRoutes(app, io) {
 
     const fulfillOrder = async (session) => {
         console.log(`Fullfill order for: ${session.metadata.user}`)
-        
         
         const user = JSON.parse(session.metadata.user);
 

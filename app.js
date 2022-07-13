@@ -67,6 +67,19 @@ io.on('connection', requireSocketLogin, (socket) => {
 require('./routes/authRoutes')(app)
 require('./routes/billingRoutes')(app, io)
 
+// providing client assets in productoin 
+if (process.env.NODE_ENV === 'production') {
+  // give css & js static assets using express' built-in middleware
+  app.use(express.static('client/build'));
+
+  // give index.html if all other routes fail
+  const path = require('path');
+  app.get('*', (req, res) => {
+    console.log('testing dirname' + __dirname);
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
+  });
+}
+
 
 // TODO
 // Create a user model with id, email and cookie
