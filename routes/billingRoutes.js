@@ -14,6 +14,8 @@ const requireLogin = require('../middleware/requireLogin');
 module.exports = function billingRoutes(app, io) {
 
     app.post('/api/checkout', requireLogin, async (req, res) => {
+
+        io.emit("hello", "world");
         
         const session = await stripe.checkout.sessions.create({
           line_items: [

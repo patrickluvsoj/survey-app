@@ -5,6 +5,12 @@ import SurveyList from "./SurveyList"
 import { useEffect } from "react";
 
 import io from "socket.io-client";
+
+// temporary for testing survey routes and sendgrid emails
+import axios from "axios";
+window.axios = axios;
+
+// need to update this for PROD
 const ENDPOINT = "http://localhost:5000";
 
 const NewSurvey = () => <div>NewSurvey</div>

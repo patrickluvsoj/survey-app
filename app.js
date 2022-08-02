@@ -14,14 +14,15 @@ const sessionMiddleware = cookie_session({
   secret: true
 })
 
-require('./models/User')
-require('./services/passport')
+require('./models/User');
+require('./models/Survey');
+require('./services/passport');
 
-mongoose.connect(key.MONGO_URL)
+mongoose.connect(key.MONGO_URL);
 
-app.use(sessionMiddleware)
-app.use(passport.initialize())
-app.use(passport.session())
+app.use(sessionMiddleware);
+app.use(passport.initialize());
+app.use(passport.session());
 
 const http = require('http');
 const { Server } = require("socket.io");
@@ -40,32 +41,37 @@ const wrap = middleware => (socket, next) => middleware(socket.request, {}, next
 
 io.use(wrap(sessionMiddleware));
 io.use(wrap(passport.initialize()));
-io.use(wrap(passport.session()));   
+io.use(wrap(passport.session()));
 
-//get port from env variable passed by Heroku or use local port
-const port =  process.env.PORT || 5000
+io.use((socket, next) => {
+  if (socket.request.user) {
+    next();
+  } else {
+    next(new Error("unauthorized"))
+  }
+});
 
-// app.get('/', (req, res) => {
-//   res.send('Hello World!')
-// })
-
-server.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
-
-const requireSocketLogin = require('./middleware/requireSocketLogin');
+//const requireSocketLogin = require('./middleware/requireSocketLogin');
   
-io.on('connection', requireSocketLogin, (socket) => {
+io.on('connection', (socket) => {
   const userId = socket.request.session.passport.user;
 
   console.log(`New connection established: ${userId}`);
   
   socket.join(userId);
-  console.log(`socket has joined following room: ${JSON.stringify(socket.rooms)}`)
+  console.log(`socket has joined following room: ${JSON.stringify(socket.rooms)}`);
 }); 
 
-require('./routes/authRoutes')(app)
-require('./routes/billingRoutes')(app, io)
+//get port from env variable passed by Heroku or use local port
+const port =  process.env.PORT || 5000
+
+server.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
+
+require('./routes/authRoutes')(app);
+require('./routes/billingRoutes')(app, io);
+require('./routes/surveyRoutes')(app);
 
 // providing client assets in productoin 
 if (process.env.NODE_ENV === 'production') {
