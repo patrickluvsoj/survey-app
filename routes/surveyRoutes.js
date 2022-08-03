@@ -1,9 +1,10 @@
 
 const mongoose = require('mongoose');
 const SurveySchema = mongoose.model('surveys');
+const UserSchema = mongoose.model('users');
 
-const keys = require('../config/keys');
 const sgMail = require('@sendgrid/mail');
+const keys = require('../config/keys');
 sgMail.setApiKey(keys.SENDGRID_KEY);
 
 const requireLogin = require('../middleware/requireLogin');
@@ -11,10 +12,13 @@ const requireCredits = require('../middleware/requireCredits');
 
 const surveyTemplate = require('../templates/surveyTemplate');
 
+// reference following sendgrid documentation: https://github.com/sendgrid/sendgrid-nodejs/blob/main/docs/use-cases/single-email-multiple-recipients.md
 module.exports = function surveyRoutes(app) {
+    
+    // require credits and login to make post request
     app.post('/api/surveys', requireLogin, requireCredits, async (req, res) => {
         
-        //dummy req.body coming from form
+        //mock-up req.body data coming from a form submission
         req.body = {
             title: "Test Survey",
             subject: "Product Survey",
@@ -27,7 +31,6 @@ module.exports = function surveyRoutes(app) {
 
         console.log('title: ' + req.user.id + ', typeof: ' + typeof req.user.id );
     
-        //Create Survey instance
         const survey = await new SurveySchema({
             title: title,
             subject: subject,
@@ -38,7 +41,6 @@ module.exports = function surveyRoutes(app) {
             dateSent: Date.now(),
         });
 
-        // view https://github.com/sendgrid/sendgrid-nodejs/blob/main/docs/use-cases/single-email-multiple-recipients.md
         const test_recipients = survey.recipients.map( recipient => recipient.email )
         console.log('recipients: ' + test_recipients + ', typeof: ' + typeof test_recipients);
         
@@ -48,7 +50,6 @@ module.exports = function surveyRoutes(app) {
             subject: survey.subject,
             text: survey.body,
             html: surveyTemplate(survey),
-            //  sure click tracking is enabled
             trackingSettings: {
                 clickTracking: {
                   enable: true,
@@ -57,16 +58,38 @@ module.exports = function surveyRoutes(app) {
             },
         };
         
-        sgMail.sendMultiple(msg);
+        sgMail.sendMultiple(msg).then(async () => {
+            // save survey instance
+            await survey.save();
+            // deduct survey credits
+            const mongoUsr = await UserSchema.findById(req.user.id);
+            console.log(`user data from Mongo: ${mongoUsr}`) 
 
-        // replace the URL based on Dev of Prod
-        // save survey instance
-        // deduct survey credits
-        // res.send(req.user) to update credits?
+            mongoUsr.credits -= 5;
+            const updatedUser = await mongoUsr.save();
+            console.log(`updated order in mongoDB: ${updatedUser}`) 
+            
+            res.send(req.user);
+          })
+          .catch(error => {
+            console.error(error);
+        
+            if (error.response) {
+              const {message, code, response} = error;
+              
+              const {headers, body} = response;
+        
+              console.error(message, body);
+            }
+
+            res.send("Something went wrong with sending the email(s)")
+          });
+        ;
+
+
     });
 
     app.get('/api/surveys/thanks', (req, res) => {
-
         res.send("Thank you for submitting a response!");
     });
 }

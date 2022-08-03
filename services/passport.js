@@ -27,7 +27,6 @@ passport.deserializeUser( async (id, done) => {
     }
 })
 
-
 //separate passport related functionality into a separate file later
 passport.use(
         new GoogleStrategy({

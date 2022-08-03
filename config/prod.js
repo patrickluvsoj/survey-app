@@ -6,4 +6,5 @@ module.exports = {
     STRIPE_PUBLISHABLE: process.env.STRIPE_PUBLISHABLE,
     STRIPE_SECRET: process.env.STRIPE_SECRET,
     SENDGRID_KEY: process.env.SENDGRID_KEY,
+    URL_DOMAIN: process.env.URL_DOMAIN,
 };
