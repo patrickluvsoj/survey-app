@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { useRecoilValueLoadable } from "recoil";
+import { useRecoilState } from "recoil";
 
-
-import { fetchUserState } from "../Services/fetchUserState";
+import { userState } from "../Atoms/userState";
 import Payment from "./Payment";
 
 
@@ -15,15 +14,15 @@ const Message = ({ message }) => (
 
 function Header() {
     // Check if user is logged in to decide on what content to show
-    const response = useRecoilValueLoadable(fetchUserState);
-    const { contents } = response;
-     
-    useEffect(() => {
-        console.log(`User id: ${contents.user_id} and credits ${contents.credits}`)
-        setCredits(contents.credits)
-    }, [contents.credits, contents.user_id])
+    // const response = useRecoilValueLoadable(fetchUserState);
+    // const { contents } = response;
+    const [ user ] = useRecoilState(userState);
 
-    const [credits, setCredits] = useState(contents.credits)
+    // useEffect(() => {
+    //     console.log(JSON.stringify(user));
+    // });
+
+    // const [credits, setCredits] = useState(contents.credits)
     const [message, setMessage] = useState("")
 
     // Check to see if this is a redirect back from Checkout
@@ -37,26 +36,37 @@ function Header() {
         if (query.get("canceled")) {
           setMessage("Canceled!");
         }
-
     }, [])
 
     const renderMessageOrPayment = ( message ) => {
         return message ? <Message message={message} /> : <Payment />
     }
 
+
+    const renderMenu = () => {
+        if (user) { 
+            return [
+                <li key="credits">
+                    {user.credits}
+                </li>,
+                <li key="payment-message">
+                    {renderMessageOrPayment(message)}
+                </li>,
+                <li key="logout"><a href="/logout">Logout</a></li>
+            ];
+        } else {
+            return <li><a href="/auth/google">Login</a></li>;
+        }
+
+    }
+
     return (
         <div>
             <nav>
                 <div className="nav-wrapper">
-                    <a className="brand-logo" href="/">Home</a>
+                    <a className="left brand-logo" href="/">Home</a>
                     <ul id="nav-mobile" className="right hide-on-med-and-down">
-                        <li>
-                            {credits}
-                        </li>
-                        <li>
-                            {renderMessageOrPayment(message)}
-                        </li>
-                        <li>{contents.user_id ? "Logout" : "Login"}</li>
+                        {renderMenu()}
                     </ul>
                 </div>
             </nav>
@@ -64,7 +74,7 @@ function Header() {
         </div>
     )
   };
-  
+
   export default Header;
   
 

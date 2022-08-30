@@ -7,7 +7,7 @@ const proxy = {
 
 module.exports = function(app) {
   app.use(
-    ['/auth/google', '/api/current_user', '/api/checkout', '/api/surveys'],
+    ['/auth/google', '/api/current_user', '/api/checkout', '/api/surveys', '/logout'],
     createProxyMiddleware(proxy)
   );
 };

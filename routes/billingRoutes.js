@@ -48,8 +48,6 @@ module.exports = function billingRoutes(app, io) {
           const updatedUser = await mongoUsr.save();
           console.log(`updated order in mongoDB: ${updatedUser}`) 
 
-          // Broadcast event to client
-          io.to(user._id).emit("monogoDB updated");
 
         } else {
           console.log("cannot find user in Mongo")

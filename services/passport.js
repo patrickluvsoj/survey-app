@@ -2,8 +2,6 @@ const passport = require('passport')
 const GoogleStrategy = require('passport-google-oauth20').Strategy
 const key = require('../config/keys')
 
-// console.log(`Key client and Secret ${key.GOOGLE_CLIENT} AND ${key.GOOGLE_SECRET}`) 
-
 const mongoose = require('mongoose')
 const UserSchema = mongoose.model('users')
 
@@ -27,7 +25,6 @@ passport.deserializeUser( async (id, done) => {
     }
 })
 
-//separate passport related functionality into a separate file later
 passport.use(
         new GoogleStrategy({
         clientID: key.GOOGLE_CLIENT,

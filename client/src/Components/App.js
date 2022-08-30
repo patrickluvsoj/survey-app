@@ -3,6 +3,7 @@ import Header from "./Header"
 import Thread from "./Thread"
 import SurveyList from "./SurveyList"
 import { useEffect } from "react";
+import { fetchUser } from "../Actions/fetchUser";
 
 import io from "socket.io-client";
 
@@ -16,6 +17,8 @@ const ENDPOINT = "http://localhost:5000";
 const NewSurvey = () => <div>NewSurvey</div>
 
 function App() {
+
+  fetchUser();
 
   useEffect(() => {
     const socket = io(ENDPOINT, {

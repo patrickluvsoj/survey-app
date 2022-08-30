@@ -80,6 +80,7 @@ if (process.env.NODE_ENV === 'production') {
 
   // give index.html if all other routes fail
   const path = require('path');
+  
   app.get('*', (req, res) => {
     console.log('testing dirname' + __dirname);
     res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
