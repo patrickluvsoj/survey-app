@@ -14,15 +14,8 @@ const Message = ({ message }) => (
 
 function Header() {
     // Check if user is logged in to decide on what content to show
-    // const response = useRecoilValueLoadable(fetchUserState);
-    // const { contents } = response;
     const [ user ] = useRecoilState(userState);
 
-    // useEffect(() => {
-    //     console.log(JSON.stringify(user));
-    // });
-
-    // const [credits, setCredits] = useState(contents.credits)
     const [message, setMessage] = useState("")
 
     // Check to see if this is a redirect back from Checkout

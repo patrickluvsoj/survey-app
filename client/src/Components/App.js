@@ -1,7 +1,6 @@
-import { Routes, Route } from "react-router-dom"
-import Header from "./Header"
-import Thread from "./Thread"
-import SurveyList from "./SurveyList"
+import { Routes, Route } from "react-router-dom";
+import Header from "./Header";
+import NewSurvey from "./NewSurvey";
 import { useEffect } from "react";
 import { fetchUser } from "../Actions/fetchUser";
 
@@ -13,8 +12,6 @@ window.axios = axios;
 
 // need to update this for PROD
 const ENDPOINT = "http://localhost:5000";
-
-const NewSurvey = () => <div>NewSurvey</div>
 
 function App() {
 
@@ -33,9 +30,7 @@ function App() {
     <div className="App">
       <Routes>
         <Route path='/' element={<Header />}>
-          <Route path='threads' element={<Thread />}/>
-          <Route path='surveys' element={<SurveyList />}/>
-          <Route path='surveys/new' element={<NewSurvey />}/>
+          <Route path='newsurvey' element={<NewSurvey />}/>
         </Route>
       </Routes>
     </div>
