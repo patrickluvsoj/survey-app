@@ -80,7 +80,7 @@ if (process.env.NODE_ENV === 'production') {
 
   // give index.html if all other routes fail
   const path = require('path');
-  
+
   app.get('*', (req, res) => {
     console.log('testing dirname' + __dirname);
     res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
@@ -92,8 +92,6 @@ if (process.env.NODE_ENV === 'production') {
 // Create a user model with id, email and cookie
 // Check if user is in DB if YES, get cookie and deserialize
 // IF user doesn not exist, serialize and store cookie
-
-
 
 // DONE - Install necessary packages like passport, google etc 
 // DONE - Setup routes for handling auth
