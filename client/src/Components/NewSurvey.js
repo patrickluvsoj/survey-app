@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 
 //4. Figure out how to use Recoil and React Hook Form**
@@ -18,15 +19,35 @@ import { useState } from "react";
 
 const NewSurvey = () => {
     const [review, setReview] = useState(false)
+    const { register, handleSubmit, watch, formState: { errors } } = useForm();
 
-    const handleClick = () => {
+    console.log(watch("example"));
+
+    const onSubmit = data => console.log(data);
+
+    const handleReviewClick = () => {
         setReview(!review)
     }
 
+    const regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+
     return (
         <div>
-            <button onClick={handleClick}>Review</button>
-            {review ? <EditSurvey/> : <ReviewSurvey/>}
+            <form onSubmit={handleSubmit(onSubmit)}>
+                <input defaultValue="test" {...register("title", { required: true })} />
+                {errors.title && <span>This field is required</span>}
+                
+                <input {...register("subject", { required: true })} />
+                {errors.subject && <span>This field is required</span>}
+
+                <input {...register("email", { required: true, pattern: regex })} />
+                {errors.email && <span>This field is required</span>}
+                
+                {/* <input type="submit" /> */}
+                <button onClick={handleSubmit(onSubmit)}>Review</button>
+            </form>
+            {/* <button onClick={handleReviewClick}>Review</button>
+            {review ? <EditSurvey/> : <ReviewSurvey/>} */}
         </div>
         
     )
@@ -39,6 +60,11 @@ const EditSurvey = () => {
 }
 
 const ReviewSurvey = () => {
+
+    const handleBackClick = () => {
+        console.log("clicked back button")
+    }
+
     return (
         <div>ReviewSurvey</div>
     )

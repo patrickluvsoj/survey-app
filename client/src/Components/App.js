@@ -11,20 +11,20 @@ import axios from "axios";
 window.axios = axios;
 
 // need to update this for PROD
-const ENDPOINT = "http://localhost:5000";
+// const ENDPOINT = "http://localhost:5000";
 
 function App() {
 
   fetchUser();
 
-  useEffect(() => {
-    const socket = io(ENDPOINT, {
-      withCredentials: true,
-    });
-    socket.onAny((event, ...args) => {
-      console.log(event, args);
-    });
-  }, []);
+  // useEffect(() => {
+  //   const socket = io(ENDPOINT, {
+  //     withCredentials: true,
+  //   });
+  //   socket.onAny((event, ...args) => {
+  //     console.log(event, args);
+  //   });
+  // }, []);
 
   return (
     <div className="App">

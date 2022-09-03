@@ -40,7 +40,7 @@ function Header() {
         if (user) { 
             return [
                 <li key="credits">
-                    {user.credits}
+                    {`Credits ${user.credits}`}
                 </li>,
                 <li key="payment-message">
                     {renderMessageOrPayment(message)}
