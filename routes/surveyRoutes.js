@@ -59,30 +59,20 @@ module.exports = function surveyRoutes(app) {
         };
         
         sgMail.sendMultiple(msg).then(async () => {
-            
             try {
                 await survey.save();
                 req.user.credits -= 5;
                 const user = await req.user.save();
             } catch (err) {
                 res.status(422).send("Something went wrong with updating the data" + err);
-            }
-
-            // const mongoUsr = await UserSchema.findById(req.user.id);
-            // console.log(`user data from Mongo: ${mongoUsr}`) 
-
-            // mongoUsr.credits -= 5;
-            // const updatedUser = await mongoUsr.save();
-            // console.log(`updated order in mongoDB: ${updatedUser}`) 
-            
+            }            
             res.send(user);
           })
           .catch(error => {
             console.error(error);
         
             if (error.response) {
-              const {message, code, response} = error;
-              
+              const {message, code, response} = error;              
               const {headers, body} = response;
         
               console.error(message, body);

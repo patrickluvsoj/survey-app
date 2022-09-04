@@ -2,6 +2,101 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 
+const NewSurvey = () => {
+    const [review, setReview] = useState(false)
+    const { register, handleSubmit, watch, reset, getValues, formState: { errors } } = useForm({
+        defaultValues: {
+            title: "",
+            subject: "",
+            email: ""
+        }
+    });
+
+    console.log(watch("example"));
+
+    const onSubmit = data => {
+        console.log(data);
+        setReview(true);
+    }
+
+    const regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+
+    const editForm = (
+        <div>
+            <form onSubmit={handleSubmit(onSubmit)}>
+                <input {...register("title", { required: true })} />
+                {errors.title && <span>This field is required</span>}
+                
+                <input {...register("subject", { required: true })} />
+                {errors.subject && <span>This field is required</span>}
+
+                <input {...register("email", { required: true, pattern: regex })} />
+                {errors.email && <span>This field is required</span>}
+                
+                {/* <input type="submit" /> */}
+                <button onClick={handleSubmit(onSubmit)}>Review</button>
+            </form>
+        </div>
+    );
+
+    const handleBackClick = () => {
+        setReview(false);
+    }
+
+    const handleSubmitClick = () => {
+        try {
+            alert("posted message to survey routes");
+        } catch(error) {
+            console.log(error);
+        }
+
+        reset();
+        setReview(false);
+    }
+
+    const renderPreview = () => {
+        const formValues = getValues();
+
+        return (
+            <div>
+                <h3>Title</h3>
+                <label>{formValues.title}</label>
+                <h3>Subject</h3>
+                <label>{formValues.subject}</label>
+                <h3>Email</h3>
+                <label>{formValues.email}</label>
+            </div>
+        )
+    }
+
+    const reviewForm = (
+        <div>
+            <h2>ReviewForm</h2>
+            {renderPreview()}
+            <button onClick={handleBackClick}>Back</button>
+            <button onClick={handleSubmitClick}>Submit</button>
+        </div>
+    );
+
+    return (
+        review ? reviewForm : editForm
+    )
+}
+
+export default NewSurvey;
+
+
+
+// TODO
+// Create a preview of data in reviewForm 
+// re-route to editForm
+// Clear form when re-routing
+// Figure out how to POST to survey routes
+    // Wrap in try catch so that it doesn't re-route if submissin doesn;t work
+// Persist the data and reviewForm state when hitting refresh button
+// Re-organize the structure of app
+
+
 //4. Figure out how to use Recoil and React Hook Form**
 //  - Should data live as Recoil Atom? 
 //  - Or can it just be a higher order component state?
@@ -15,59 +110,3 @@ import { useForm } from "react-hook-form";
 //  7. Introduce validation 
 //  8. Add email field and validation
 // 	2. READ: https://react-hook-form.com/get-started#Integratingwithglobalstate
-
-
-const NewSurvey = () => {
-    const [review, setReview] = useState(false)
-    const { register, handleSubmit, watch, formState: { errors } } = useForm();
-
-    console.log(watch("example"));
-
-    const onSubmit = data => console.log(data);
-
-    const handleReviewClick = () => {
-        setReview(!review)
-    }
-
-    const regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-
-    return (
-        <div>
-            <form onSubmit={handleSubmit(onSubmit)}>
-                <input defaultValue="test" {...register("title", { required: true })} />
-                {errors.title && <span>This field is required</span>}
-                
-                <input {...register("subject", { required: true })} />
-                {errors.subject && <span>This field is required</span>}
-
-                <input {...register("email", { required: true, pattern: regex })} />
-                {errors.email && <span>This field is required</span>}
-                
-                {/* <input type="submit" /> */}
-                <button onClick={handleSubmit(onSubmit)}>Review</button>
-            </form>
-            {/* <button onClick={handleReviewClick}>Review</button>
-            {review ? <EditSurvey/> : <ReviewSurvey/>} */}
-        </div>
-        
-    )
-}
-
-const EditSurvey = () => {
-    return (
-        <div>EditSurvey</div>
-    )
-}
-
-const ReviewSurvey = () => {
-
-    const handleBackClick = () => {
-        console.log("clicked back button")
-    }
-
-    return (
-        <div>ReviewSurvey</div>
-    )
-}
-
-export default NewSurvey;
