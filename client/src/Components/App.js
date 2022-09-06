@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate, Link } from "react-router-dom";
 import Header from "./Header";
 import NewSurvey from "./NewSurvey";
 import { useEffect } from "react";
@@ -15,7 +15,7 @@ window.axios = axios;
 
 function App() {
 
-  fetchUser();
+  const isAuthenticated = fetchUser();
 
   // useEffect(() => {
   //   const socket = io(ENDPOINT, {
@@ -26,18 +26,56 @@ function App() {
   //   });
   // }, []);
 
+  const AuthWrapper = ({isAuthenticated}) => {
+
+    return isAuthenticated ? 
+    <Navigate to="/dashboard" replace /> :
+     <Navigate to="/homepage" replace />
+
+  };
+
   return (
     <div className="App">
       <Routes>
         <Route path='/' element={<Header />}>
+          
+
+          <Route
+            path="/"
+            element={<AuthWrapper isAuthenticated={isAuthenticated} />}
+          />
+          <Route path='dashboard' element={<Dashboard />}/>
+          <Route path='homepage' element={<HomePage />}/>
           <Route path='newsurvey' element={<NewSurvey />}/>
         </Route>
       </Routes>
     </div>
   );
-}
+
+
+};
 
 export default App;
+
+
+const HomePage = () => {
+  return (
+    <div>Homepage Component</div>
+  )
+}
+
+const Dashboard = () => {
+  return (
+    <div>
+      <div>Dashboard component</div>
+      <Link to="NewSurvey">New Survey</Link>
+    </div>
+  )
+}
+
+
+
+
 
 
 

@@ -7,6 +7,7 @@ export const fetchUser = async () => {
         const response = await axios.get("/api/current_user");
 
         setRecoil(userState, response.data);
+        return response;
     } catch(error) {
         throw error 
     }

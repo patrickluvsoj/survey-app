@@ -2,9 +2,9 @@ import { setRecoil } from 'recoil-nexus';
 import { userState } from '../Atoms/userState';
 import axios from 'axios';
 
-export const fetchUser = async (values) => {
+export const submitSurvey = async (values) => {
     try {
-        const response = await axios.get("/api/surveys", values);
+        const response = await axios.post("/api/surveys", values);
 
         setRecoil(userState, response.data);
     } catch(error) {
