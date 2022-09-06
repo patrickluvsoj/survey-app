@@ -1,20 +1,21 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { submitSurvey } from "../Actions/submitSurvey";
 
 
 const NewSurvey = () => {
     const [review, setReview] = useState(false)
-    const { register, handleSubmit, watch, reset, getValues, formState: { errors } } = useForm({
-        defaultValues: {
-            title: "",
-            subject: "",
-            email: ""
-        }
-    });
+    const { register, handleSubmit, watch, reset, getValues, formState: { errors } } = useForm(
+        // {defaultValues: {
+        //     title: "",
+        //     subject: "",
+        //     email: ""
+        // }}
+    );
 
-    console.log(watch("example"));
+    // console.log(watch("from"));
 
-    const onSubmit = data => {
+    const onReview = data => {
         console.log(data);
         setReview(true);
     }
@@ -23,18 +24,24 @@ const NewSurvey = () => {
 
     const editForm = (
         <div>
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onReview)}>
                 <input {...register("title", { required: true })} />
                 {errors.title && <span>This field is required</span>}
                 
                 <input {...register("subject", { required: true })} />
                 {errors.subject && <span>This field is required</span>}
 
-                <input {...register("email", { required: true, pattern: regex })} />
-                {errors.email && <span>This field is required</span>}
+                <input {...register("body", { required: true })} />
+                {errors.body && <span>This field is required</span>}
+
+                <input {...register("from", { required: true, pattern: regex })} />
+                {errors.from && <span>This field is required</span>}
+
+                <input {...register("emails", { required: true, pattern: regex })} />
+                {errors.emails && <span>This field is required</span>}
                 
                 {/* <input type="submit" /> */}
-                <button onClick={handleSubmit(onSubmit)}>Review</button>
+                <button onClick={handleSubmit(onReview)}>Review</button>
             </form>
         </div>
     );
@@ -46,12 +53,12 @@ const NewSurvey = () => {
     const handleSubmitClick = () => {
         try {
             alert("posted message to survey routes");
+            submitSurvey();
+            reset();
+            setReview(false);
         } catch(error) {
             console.log(error);
         }
-
-        reset();
-        setReview(false);
     }
 
     const renderPreview = () => {
@@ -63,8 +70,12 @@ const NewSurvey = () => {
                 <label>{formValues.title}</label>
                 <h3>Subject</h3>
                 <label>{formValues.subject}</label>
-                <h3>Email</h3>
+                <h3>Body</h3>
+                <label>{formValues.body}</label>
+                <h3>From</h3>
                 <label>{formValues.email}</label>
+                <h3>Emails</h3>
+                <label>{formValues.emails}</label>
             </div>
         )
     }
@@ -85,6 +96,12 @@ const NewSurvey = () => {
 
 export default NewSurvey;
 
+
+
+//TODO
+// Re-organize the structure of app
+    // How to keep header always visible while routes change?
+    // 
 
 
 // TODO
