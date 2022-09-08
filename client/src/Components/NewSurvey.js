@@ -1,16 +1,18 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { submitSurvey } from "../Actions/submitSurvey";
 
 
 const NewSurvey = () => {
     const [review, setReview] = useState(false)
     const { register, handleSubmit, watch, reset, getValues, formState: { errors } } = useForm(
-        // {defaultValues: {
-        //     title: "",
-        //     subject: "",
-        //     email: ""
-        // }}
+        {defaultValues: {
+            title: "",
+            subject: "",
+            body: "",
+            from: "",
+            email: ""
+        }}
     );
 
     // console.log(watch("from"));
@@ -20,11 +22,14 @@ const NewSurvey = () => {
         setReview(true);
     }
 
+    // add a Atom for from values and useRecoilValue
+    console.log(watch());
+
     const regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
     const editForm = (
         <div>
-            <form onSubmit={handleSubmit(onReview)}>
+            <form>
                 <input {...register("title", { required: true })} />
                 {errors.title && <span>This field is required</span>}
                 
@@ -90,7 +95,10 @@ const NewSurvey = () => {
     );
 
     return (
-        review ? reviewForm : editForm
+        <div className="container">
+            {review ? reviewForm : editForm}
+        </div>
+        
     )
 }
 
@@ -101,7 +109,14 @@ export default NewSurvey;
 //TODO
 // Re-organize the structure of app
     // How to keep header always visible while routes change?
-    // 
+// Create a Add icon using Material //add_circle
+// Add container so that content is centered
+// A way to matain form value on refresh
+    // have a way to observe chnages in component
+// Finish styling
+    // Add styling to form preview
+    // Add styling to edit form
+    // Add way to pin Add icon to right bottom
 
 
 // TODO

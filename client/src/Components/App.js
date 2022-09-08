@@ -1,10 +1,12 @@
-import { Routes, Route, Navigate, Link } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Header from "./Header";
 import NewSurvey from "./NewSurvey";
-import { useEffect } from "react";
+import Dashboard from "./Dashboard";
+import Homepage from "./Homepage";
+// import { useEffect } from "react";
 import { fetchUser } from "../Actions/fetchUser";
 
-import io from "socket.io-client";
+// import io from "socket.io-client";
 
 // temporary for testing survey routes and sendgrid emails
 import axios from "axios";
@@ -38,40 +40,22 @@ function App() {
     <div className="App">
       <Routes>
         <Route path='/' element={<Header />}>
-          
-
           <Route
             path="/"
             element={<AuthWrapper isAuthenticated={isAuthenticated} />}
           />
-          <Route path='dashboard' element={<Dashboard />}/>
-          <Route path='homepage' element={<HomePage />}/>
-          <Route path='newsurvey' element={<NewSurvey />}/>
+          <Route path='/dashboard' element={<Dashboard />}/>
+          <Route path='/homepage' element={<Homepage />}/>
+          <Route path='/newsurvey' element={<NewSurvey />}/>
         </Route>
       </Routes>
     </div>
   );
-
-
 };
 
 export default App;
 
 
-const HomePage = () => {
-  return (
-    <div>Homepage Component</div>
-  )
-}
-
-const Dashboard = () => {
-  return (
-    <div>
-      <div>Dashboard component</div>
-      <Link to="NewSurvey">New Survey</Link>
-    </div>
-  )
-}
 
 
 
