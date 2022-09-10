@@ -19,13 +19,13 @@ module.exports = function surveyRoutes(app) {
     app.post('/api/surveys', requireLogin, requireCredits, async (req, res) => {
         
         //mock-up req.body data coming from a form submission
-        req.body = {
-            title: "Test Survey",
-            subject: "Product Survey",
-            body: "Please respond to this survey!",
-            from: "hpatricksuzuki@gmail.com",
-            recipients: "patricklovesoj@gmail.com, patrick@zeplin.io",
-        }
+        // req.body = {
+        //     title: "Test Survey",
+        //     subject: "Product Survey",
+        //     body: "Please respond to this survey!",
+        //     from: "hpatricksuzuki@gmail.com",
+        //     recipients: "patricklovesoj@gmail.com, patrick@zeplin.io",
+        // }
 
         const { title, subject, body, from, recipients } = req.body;
 
