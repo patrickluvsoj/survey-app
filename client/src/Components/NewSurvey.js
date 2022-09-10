@@ -1,36 +1,46 @@
-import { useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useRecoilState } from "recoil";
 import { submitSurvey } from "../Actions/submitSurvey";
+import { formState } from "../Atoms/formState";
 
 
 const NewSurvey = () => {
     const [review, setReview] = useState(false)
+    const [form, setForm] = useRecoilState(formState);
+
     const { register, handleSubmit, watch, reset, getValues, formState: { errors } } = useForm(
         {defaultValues: {
-            title: "",
-            subject: "",
-            body: "",
-            from: "",
-            email: ""
+            title: form.title,
+            subject: form.subject,
+            body: form.body,
+            from: form.from,
+            emails: form.emails
         }}
     );
 
-    // console.log(watch("from"));
-
     const onReview = data => {
-        console.log(data);
+        // console.log(data);
         setReview(true);
     }
 
-    // add a Atom for from values and useRecoilValue
-    console.log(watch());
-
     const regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+
+    useEffect(() => {
+        const subscription = watch((value, { name, type }) => {
+            const filteredEmails = value.emails.split(",").filter(email => regex.test(email));
+            value.emails = filteredEmails;
+            setForm(value);
+        });
+        // console.log(form)
+        return () => subscription.unsubscribe();
+    }, [watch, form]);
+
 
     const editForm = (
         <div>
             <form>
-                <input {...register("title", { required: true })} />
+                <input placeholder={"This is a new survey"} {...register("title", { required: true })} />
                 {errors.title && <span>This field is required</span>}
                 
                 <input {...register("subject", { required: true })} />
@@ -59,6 +69,13 @@ const NewSurvey = () => {
         try {
             alert("posted message to survey routes");
             submitSurvey();
+            setForm({
+                title: "A new survey",
+                subject: "",
+                body: "",
+                from: "",
+                emails: ""
+            })
             reset();
             setReview(false);
         } catch(error) {
@@ -68,6 +85,11 @@ const NewSurvey = () => {
 
     const renderPreview = () => {
         const formValues = getValues();
+
+        // Move this to a component. 
+            // Add way to show invalid emails
+            // Or invalid inputs like no commas
+        // const filteredEmails = value.emails.split(",").filter(email => regex.test(email));
 
         return (
             <div>
@@ -102,6 +124,32 @@ const NewSurvey = () => {
     )
 }
 
+
+// const ReviewForm = (formValues) => {
+
+//     return (
+//         <div>
+//         <h2>ReviewForm</h2>
+//             <div>
+//                 <h3>Title</h3>
+//                 <label>{formValues.title}</label>
+//                 <h3>Subject</h3>
+//                 <label>{formValues.subject}</label>
+//                 <h3>Body</h3>
+//                 <label>{formValues.body}</label>
+//                 <h3>From</h3>
+//                 <label>{formValues.email}</label>
+//                 <h3>Emails</h3>
+//                 <label>{formValues.emails}</label>
+//             </div>
+//         <button onClick={handleBackClick}>Back</button>
+//         <button onClick={handleSubmitClick}>Submit</button>
+//         </div>
+//     )
+
+// }
+
+
 export default NewSurvey;
 
 
@@ -112,7 +160,9 @@ export default NewSurvey;
 // Create a Add icon using Material //add_circle
 // Add container so that content is centered
 // A way to matain form value on refresh
-    // have a way to observe chnages in component
+    // have a way to observe chnages in component using watch()
+    // added recoil-persist to persist after refresh
+// Need to update how email is parsed in emails field
 // Finish styling
     // Add styling to form preview
     // Add styling to edit form
