@@ -10,7 +10,7 @@ export const formState = atom({
         subject: "",
         body: "",
         from: "",
-        emails: ""
+        recipients: ""
     },
     effects_UNSTABLE: [persistAtom]
 });

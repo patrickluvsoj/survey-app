@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useRecoilState } from "recoil";
 import { submitSurvey } from "../Actions/submitSurvey";
 import { formState } from "../Atoms/formState";
+import { regex } from "../utils/regex";
 
 
 const NewSurvey = () => {
@@ -15,24 +16,18 @@ const NewSurvey = () => {
             subject: form.subject,
             body: form.body,
             from: form.from,
-            emails: form.emails
+            recipients: form.recipients
         }}
     );
 
     const onReview = data => {
-        // console.log(data);
         setReview(true);
     }
 
-    const regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-
     useEffect(() => {
         const subscription = watch((value, { name, type }) => {
-            const filteredEmails = value.emails.split(",").filter(email => regex.test(email));
-            value.emails = filteredEmails;
             setForm(value);
         });
-        // console.log(form)
         return () => subscription.unsubscribe();
     }, [watch, form]);
 
@@ -52,10 +47,9 @@ const NewSurvey = () => {
                 <input {...register("from", { required: true, pattern: regex })} />
                 {errors.from && <span>This field is required</span>}
 
-                <input {...register("emails", { required: true, pattern: regex })} />
+                <input {...register("recipients", { required: true})} />
                 {errors.emails && <span>This field is required</span>}
                 
-                {/* <input type="submit" /> */}
                 <button onClick={handleSubmit(onReview)}>Review</button>
             </form>
         </div>
@@ -68,13 +62,13 @@ const NewSurvey = () => {
     const handleSubmitClick = () => {
         try {
             alert("posted message to survey routes");
-            submitSurvey();
+            submitSurvey(getValues());
             setForm({
                 title: "A new survey",
                 subject: "",
                 body: "",
                 from: "",
-                emails: ""
+                recipients: ""
             })
             reset();
             setReview(false);
@@ -83,71 +77,65 @@ const NewSurvey = () => {
         }
     }
 
-    const renderPreview = () => {
-        const formValues = getValues();
-
-        // Move this to a component. 
-            // Add way to show invalid emails
-            // Or invalid inputs like no commas
-        // const filteredEmails = value.emails.split(",").filter(email => regex.test(email));
-
-        return (
-            <div>
-                <h3>Title</h3>
-                <label>{formValues.title}</label>
-                <h3>Subject</h3>
-                <label>{formValues.subject}</label>
-                <h3>Body</h3>
-                <label>{formValues.body}</label>
-                <h3>From</h3>
-                <label>{formValues.email}</label>
-                <h3>Emails</h3>
-                <label>{formValues.emails}</label>
-            </div>
-        )
-    }
-
-    const reviewForm = (
-        <div>
-            <h2>ReviewForm</h2>
-            {renderPreview()}
-            <button onClick={handleBackClick}>Back</button>
-            <button onClick={handleSubmitClick}>Submit</button>
-        </div>
-    );
-
     return (
         <div className="container">
-            {review ? reviewForm : editForm}
+            {review ? 
+                <ReviewForm 
+                    formValues={getValues()} 
+                    handleBackClick={() => handleBackClick}
+                    handleSubmitClick={() => handleSubmitClick}
+                /> : editForm}
         </div>
-        
     )
 }
 
 
-// const ReviewForm = (formValues) => {
+const ReviewForm = (props) => {
+    const { formValues, handleBackClick, handleSubmitClick } = props;
 
-//     return (
-//         <div>
-//         <h2>ReviewForm</h2>
-//             <div>
-//                 <h3>Title</h3>
-//                 <label>{formValues.title}</label>
-//                 <h3>Subject</h3>
-//                 <label>{formValues.subject}</label>
-//                 <h3>Body</h3>
-//                 <label>{formValues.body}</label>
-//                 <h3>From</h3>
-//                 <label>{formValues.email}</label>
-//                 <h3>Emails</h3>
-//                 <label>{formValues.emails}</label>
-//             </div>
-//         <button onClick={handleBackClick}>Back</button>
-//         <button onClick={handleSubmitClick}>Submit</button>
-//         </div>
-//     )
+    const invalidEmails = formValues.recipients.split(",")
+    .map(email => email.trim())
+    .filter(email => {
+        console.log(`${email} is a valid email? ${regex.test(email)}`);
+        return !regex.test(email);
+    });
 
-// }
+    const renderInvalidEmails = (invalidEmails) => {
+        if (invalidEmails.length !== 0) {
+            return (
+                <div>
+                    <h6>Warning. The following emails entered are invalid:</h6>
+                    <ul>
+                        {invalidEmails.map(email => <div>{email}</div>)}
+                    </ul>
+                </div>
+            )
+        } else {
+            return null
+        }
+    }
+
+    return (
+        <div>
+            {renderInvalidEmails(invalidEmails)}
+            <h2>ReviewForm</h2>
+                <div>
+                    <h3>Title</h3>
+                    <label>{formValues.title}</label>
+                    <h3>Subject</h3>
+                    <label>{formValues.subject}</label>
+                    <h3>Body</h3>
+                    <label>{formValues.body}</label>
+                    <h3>From</h3>
+                    <label>{formValues.from}</label>
+                    <h3>Emails</h3>
+                    <label>{formValues.recipients}</label>
+                </div>
+            <button onClick={handleBackClick()}>Back</button>
+            <button onClick={handleSubmitClick()}>Submit</button>
+        </div>
+    )
+}
 
 
 export default NewSurvey;
@@ -163,6 +151,12 @@ export default NewSurvey;
     // have a way to observe chnages in component using watch()
     // added recoil-persist to persist after refresh
 // Need to update how email is parsed in emails field
+    // Figure out how to pass emails to survey routes
+    // Check email parsing mechanism for surveyRoutes
+// TEST the submission. Make sure emails are validates AND emails are sent
+    // Resolve req.body undefined issue by using express.json().
+
+// Preserve Form preview state on refresh
 // Finish styling
     // Add styling to form preview
     // Add styling to edit form
