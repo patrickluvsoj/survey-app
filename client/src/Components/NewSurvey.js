@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRecoilState } from "recoil";
 import { submitSurvey } from "../Actions/submitSurvey";
 import { formState } from "../Atoms/formState";
+import { previewState } from "../Atoms/previewState";
 import { regex } from "../utils/regex";
+
+import ReviewSurvey from "./ReviewSurvey";
 
 
 const NewSurvey = () => {
-    const [review, setReview] = useState(false)
+    const [review, setReview] = useRecoilState(previewState);
     const [form, setForm] = useRecoilState(formState);
 
     const { register, handleSubmit, watch, reset, getValues, formState: { errors } } = useForm(
@@ -61,7 +64,7 @@ const NewSurvey = () => {
 
     const handleSubmitClick = () => {
         try {
-            alert("posted message to survey routes");
+            alert("The survey has been sent!");
             submitSurvey(getValues());
             setForm({
                 title: "A new survey",
@@ -80,7 +83,7 @@ const NewSurvey = () => {
     return (
         <div className="container">
             {review ? 
-                <ReviewForm 
+                <ReviewSurvey
                     formValues={getValues()} 
                     handleBackClick={() => handleBackClick}
                     handleSubmitClick={() => handleSubmitClick}
@@ -88,55 +91,6 @@ const NewSurvey = () => {
         </div>
     )
 }
-
-
-const ReviewForm = (props) => {
-    const { formValues, handleBackClick, handleSubmitClick } = props;
-
-    const invalidEmails = formValues.recipients.split(",")
-    .map(email => email.trim())
-    .filter(email => {
-        console.log(`${email} is a valid email? ${regex.test(email)}`);
-        return !regex.test(email);
-    });
-
-    const renderInvalidEmails = (invalidEmails) => {
-        if (invalidEmails.length !== 0) {
-            return (
-                <div>
-                    <h6>Warning. The following emails entered are invalid:</h6>
-                    <ul>
-                        {invalidEmails.map(email => <div>{email}</div>)}
-                    </ul>
-                </div>
-            )
-        } else {
-            return null
-        }
-    }
-
-    return (
-        <div>
-            {renderInvalidEmails(invalidEmails)}
-            <h2>ReviewForm</h2>
-                <div>
-                    <h3>Title</h3>
-                    <label>{formValues.title}</label>
-                    <h3>Subject</h3>
-                    <label>{formValues.subject}</label>
-                    <h3>Body</h3>
-                    <label>{formValues.body}</label>
-                    <h3>From</h3>
-                    <label>{formValues.from}</label>
-                    <h3>Emails</h3>
-                    <label>{formValues.recipients}</label>
-                </div>
-            <button onClick={handleBackClick()}>Back</button>
-            <button onClick={handleSubmitClick()}>Submit</button>
-        </div>
-    )
-}
-
 
 export default NewSurvey;
 

@@ -17,32 +17,25 @@ module.exports = function surveyRoutes(app) {
     
     // require credits and login to make post request
     app.post('/api/surveys', requireLogin, requireCredits, async (req, res) => {
-        
-        //mock-up req.body data coming from a form submission
-        // req.body = {
-        //     title: "Test Survey",
-        //     subject: "Product Survey",
-        //     body: "Please respond to this survey!",
-        //     from: "hpatricksuzuki@gmail.com",
-        //     recipients: "patricklovesoj@gmail.com, patrick@zeplin.io",
-        // }
 
         const { title, subject, body, from, recipients } = req.body;
 
-        console.log('title: ' + req.user.id + ', typeof: ' + typeof req.user.id );
+        // Check if we properly received survey submission data from client
+        // console.log('user_id: ' + req.user.id + ', typeof: ' + typeof req.user.id );
     
         const survey = await new SurveySchema({
             title: title,
             subject: subject,
             body: body,
             from: from,
-            recipients: recipients.split(",").map(email => ({ email })),
+            recipients: recipients.split(",").map(email => ({ email: email.trim() })),
             _user: req.user.id,
             dateSent: Date.now(),
         });
 
-        const test_recipients = survey.recipients.map( recipient => recipient.email )
-        console.log('recipients: ' + test_recipients + ', typeof: ' + typeof test_recipients);
+        // Check if email have been parsed properly
+        // const test_recipients = survey.recipients.map( recipient => recipient.email )
+        // console.log('recipients: ' + test_recipients + ', typeof: ' + typeof test_recipients);
         
         const msg = {
             to: survey.recipients.map( recipient => recipient.email ),
@@ -57,7 +50,7 @@ module.exports = function surveyRoutes(app) {
                 },
             },
         };
-        
+                
         sgMail.sendMultiple(msg).then(async () => {
             try {
                 await survey.save();
@@ -67,22 +60,19 @@ module.exports = function surveyRoutes(app) {
             } catch (err) {
                 res.status(422).send("Something went wrong with updating the data" + err);
             }            
-          })
-          .catch(error => {
+            })
+            .catch(error => {
             console.error(error);
         
             if (error.response) {
-              const {message, code, response} = error;              
-              const {headers, body} = response;
+                const {message, code, response} = error;              
+                const {headers, body} = response;
         
-              console.error(message, body);
+                console.error(message, body);
             }
 
             res.status(422).send("Something went wrong with sending the email(s)")
-          });
-        ;
-
-
+            });
     });
 
     app.get('/api/surveys/thanks', (req, res) => {
