@@ -1,7 +1,7 @@
 
 const mongoose = require('mongoose');
 const SurveySchema = mongoose.model('surveys');
-const UserSchema = mongoose.model('users');
+const express = require('express');
 
 const sgMail = require('@sendgrid/mail');
 const keys = require('../config/keys');
@@ -16,7 +16,7 @@ const surveyTemplate = require('../templates/surveyTemplate');
 module.exports = function surveyRoutes(app) {
     
     // require credits and login to make post request
-    app.post('/api/surveys', requireLogin, requireCredits, async (req, res) => {
+    app.post('/api/surveys', express.json(), requireLogin, requireCredits, async (req, res) => {
 
         const { title, subject, body, from, recipients } = req.body;
 
@@ -51,28 +51,28 @@ module.exports = function surveyRoutes(app) {
             },
         };
                 
-        sgMail.sendMultiple(msg).then(async () => {
-            try {
-                await survey.save();
-                req.user.credits -= 5;
-                const user = await req.user.save();
-                res.send(user);
-            } catch (err) {
-                res.status(422).send("Something went wrong with updating the data" + err);
-            }            
-            })
-            .catch(error => {
-            console.error(error);
+        // sgMail.sendMultiple(msg).then(async () => {
+        //     try {
+        //         await survey.save();
+        //         req.user.credits -= 5;
+        //         const user = await req.user.save();
+        //         res.send(user);
+        //     } catch (err) {
+        //         res.status(422).send("Something went wrong with updating the data" + err);
+        //     }            
+        //     })
+        //     .catch(error => {
+        //     console.error(error);
         
-            if (error.response) {
-                const {message, code, response} = error;              
-                const {headers, body} = response;
+        //     if (error.response) {
+        //         const {message, code, response} = error;              
+        //         const {headers, body} = response;
         
-                console.error(message, body);
-            }
+        //         console.error(message, body);
+        //     }
 
-            res.status(422).send("Something went wrong with sending the email(s)")
-            });
+        //     res.status(422).send("Something went wrong with sending the email(s)")
+        //     });
     });
 
     app.get('/api/surveys/thanks', (req, res) => {

@@ -1,7 +1,5 @@
 import { atom } from 'recoil';
-import { recoilPersist } from 'recoil-persist'
-
-const { persistAtom } = recoilPersist()
+import { localStorageEffect } from '../utils/localStorageEffects';
 
 export const formState = atom({
     key: 'formState',
@@ -12,5 +10,7 @@ export const formState = atom({
         from: "",
         recipients: ""
     },
-    effects_UNSTABLE: [persistAtom]
+    // effects: [
+    //     localStorageEffect('form'),
+    // ]
 });

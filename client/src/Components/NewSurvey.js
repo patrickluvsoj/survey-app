@@ -5,6 +5,10 @@ import { submitSurvey } from "../Actions/submitSurvey";
 import { formState } from "../Atoms/formState";
 import { previewState } from "../Atoms/previewState";
 import { regex } from "../utils/regex";
+import { Link } from "react-router-dom";
+import { ErrorMessage } from "@hookform/error-message";
+import { validateEmails } from "../utils/validateEmails";
+import { useNavigate } from "react-router-dom";
 
 import ReviewSurvey from "./ReviewSurvey";
 
@@ -12,6 +16,9 @@ import ReviewSurvey from "./ReviewSurvey";
 const NewSurvey = () => {
     const [review, setReview] = useRecoilState(previewState);
     const [form, setForm] = useRecoilState(formState);
+    const navigate = useNavigate();
+
+    console.log("form state when initial component load", form);
 
     const { register, handleSubmit, watch, reset, getValues, formState: { errors } } = useForm(
         {defaultValues: {
@@ -23,37 +30,119 @@ const NewSurvey = () => {
         }}
     );
 
-    const onReview = data => {
+    const onNext = () => {
         setReview(true);
     }
 
     useEffect(() => {
+        console.log("form state in use effect before watch triggers : ", form);
+
         const subscription = watch((value, { name, type }) => {
+            console.log("watch triggerd: ", value);
             setForm(value);
+            console.log("form state in Recoil: ", form);
         });
         return () => subscription.unsubscribe();
     }, [watch, form]);
 
+    const handleSubmitClick = () => {
+        try {
+            alert("The survey has been sent!");
+            submitSurvey(getValues());
+
+            setForm({
+                title: "",
+                subject: "",
+                body: "",
+                from: "",
+                recipients: "",
+            });
+            console.log("recoild setForm called", form);
+            
+            localStorage.clear();
+            console.log("local storage cleared: ", localStorage.getItem('form'));
+
+            reset();
+            console.log("form field reset called", getValues());
+            
+            setReview(false);
+            console.log("setReview to false", localStorage.getItem('preview'));
+
+            navigate("/dashboard");
+        } catch(error) {
+            console.log(error);
+        }   
+    }
+
 
     const editForm = (
-        <div>
-            <form>
-                <input placeholder={"This is a new survey"} {...register("title", { required: true })} />
-                {errors.title && <span>This field is required</span>}
-                
-                <input {...register("subject", { required: true })} />
-                {errors.subject && <span>This field is required</span>}
+        <div className="row">
+            <form className="col s10">
+                <div className="row">
+                    <div className="input-field col s12">
+                        <input id="first_name" 
+                            className="validate" 
+                            placeholder={"This is a new survey"} 
+                            {...register("title", { required: true })} 
+                        />
+                        <label className="active" htmlFor="first_name">Survey Title</label>
+                        {errors.title && <span className="helper-text red-text text-darken-2" data-error="wrong">Required</span>}
+                    </div>
+                </div>
 
-                <input {...register("body", { required: true })} />
-                {errors.body && <span>This field is required</span>}
+                <div className="row">
+                    <div className="input-field col s12">
+                        <input id="subject" {...register("subject", { required: true })} />
+                        <label className="active" htmlFor="subject">Email Subject</label>
+                        {errors.subject && <span className="helper-text red-text text-darken-2" data-error="wrong">Required</span>}
+                    </div>
+                </div>
 
-                <input {...register("from", { required: true, pattern: regex })} />
-                {errors.from && <span>This field is required</span>}
+                <div className="row">
+                    <div className="input-field col s12">
+                        <input id="body" {...register("body", { required: true })} />
+                        <label className="active" htmlFor="body">Email Body</label>
+                        {errors.body && <span className="helper-text red-text text-darken-2" data-error="wrong">Required</span>}
+                    </div>
+                </div>
 
-                <input {...register("recipients", { required: true})} />
-                {errors.emails && <span>This field is required</span>}
-                
-                <button onClick={handleSubmit(onReview)}>Review</button>
+                <div className="row">
+                    <div className="input-field col s12">
+                        <input id="from" {...register("from", { 
+                            required: "Required", 
+                            pattern: {
+                                value: regex,
+                                message: "Not a valid email!"
+                            }
+                        })}/>
+                        <label className="active" htmlFor="from">Sender</label>
+                        {<ErrorMessage
+                            errors={errors}
+                            name="from"
+                            render={({ message }) => <span className="helper-text red-text text-darken-2">{message}</span>}
+                        />}
+                    </div>
+                </div>
+
+                <div className="row">
+                    <div className="input-field col s12">
+                        <input id="recipients" {...register("recipients", {
+                            required: "Required",
+                            // validate: v => validateEmails(v) || "there are invalid emails",
+                        })}/>
+                        <label className="active" htmlFor="recipients">Recipients</label>
+                        {<ErrorMessage
+                            errors={errors}
+                            name="recipients"
+                            render={({ message }) => <span className="helper-text red-text text-darken-2">{message}</span>}
+                        />}
+                    </div>
+                </div>
+
+                <Link className="waves-effect waves-light btn grey" to="/">
+                    Cancel
+                </Link>
+                <button className="waves-effect waves-light btn right" onClick={handleSubmit(onNext)}>Next</button>
             </form>
         </div>
     );
@@ -62,29 +151,12 @@ const NewSurvey = () => {
         setReview(false);
     }
 
-    const handleSubmitClick = () => {
-        try {
-            alert("The survey has been sent!");
-            submitSurvey(getValues());
-            setForm({
-                title: "A new survey",
-                subject: "",
-                body: "",
-                from: "",
-                recipients: ""
-            })
-            reset();
-            setReview(false);
-        } catch(error) {
-            console.log(error);
-        }
-    }
 
     return (
         <div className="container">
             {review ? 
                 <ReviewSurvey
-                    formValues={getValues()} 
+                    formValues={form} 
                     handleBackClick={() => handleBackClick}
                     handleSubmitClick={() => handleSubmitClick}
                 /> : editForm}
@@ -95,6 +167,10 @@ const NewSurvey = () => {
 export default NewSurvey;
 
 
+// OUTSTANDING Item => clear form fields after submission. It's not right now.
+
+// Solve issues with mdoule note found errors due to webpack & create react app?
+    // 
 
 //TODO
 // Re-organize the structure of app

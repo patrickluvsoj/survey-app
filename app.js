@@ -23,7 +23,7 @@ mongoose.connect(key.MONGO_URL);
 app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(express.json());
+// app.use(express.json());
 
 const http = require('http');
 const { Server } = require("socket.io");

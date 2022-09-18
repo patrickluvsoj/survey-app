@@ -1,10 +1,10 @@
 import { atom } from 'recoil';
-import { recoilPersist } from 'recoil-persist'
-
-const { persistAtom } = recoilPersist()
+import { localStorageEffect } from '../utils/localStorageEffects';
 
 export const previewState = atom({
     key: 'previewState',
     default: false,
-    effects_UNSTABLE: [persistAtom]
+    // effects: [
+    //     localStorageEffect('preview'),
+    // ],
 });

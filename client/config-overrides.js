@@ -1,4 +1,4 @@
- const webpack = require('webpack'); 
+const webpack = require('webpack'); 
  
 module.exports = function override(config) { 
 		const fallback = config.resolve.fallback || {}; 
@@ -12,7 +12,8 @@ module.exports = function override(config) {
       "zlib": require.resolve("browserify-zlib"),
       "path": require.resolve("path-browserify"),
       "url": require.resolve("url"),
-      "fs": require.resolve("fs") 
+      "fs": require.resolve("fs"),
+      "child_process": require.resolve("child_process"),
       }) 
    config.resolve.fallback = fallback; 
    config.plugins = (config.plugins || []).concat([ 

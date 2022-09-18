@@ -15,7 +15,7 @@ module.exports = function billingRoutes(app, io) {
 
     app.post('/api/checkout', requireLogin, async (req, res) => {
 
-        io.emit("hello", "world");
+        // io.emit("hello", "world");
         
         const session = await stripe.checkout.sessions.create({
           line_items: [
@@ -44,7 +44,7 @@ module.exports = function billingRoutes(app, io) {
         if (mongoose.Types.ObjectId.isValid(user._id)) {
           const mongoUsr = await UserSchema.findById(user._id);
 
-          mongoUsr.credits += 5;
+          mongoUsr.credits += 5000;
           const updatedUser = await mongoUsr.save();
           console.log(`updated order in mongoDB: ${updatedUser}`) 
 

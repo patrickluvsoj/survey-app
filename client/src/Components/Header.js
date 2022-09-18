@@ -39,11 +39,11 @@ function Header() {
     const renderMenu = () => {
         if (user) { 
             return [
-                <li key="credits">
-                    {`Credits ${user.credits}`}
-                </li>,
                 <li key="payment-message">
-                    {renderMessageOrPayment(message)}
+                {renderMessageOrPayment(message)}
+                </li>,
+                <li key="credits">
+                    {`Credits: ${user.credits}`}
                 </li>,
                 <li key="logout"><a href="/logout">Logout</a></li>
             ];
