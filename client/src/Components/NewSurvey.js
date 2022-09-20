@@ -128,7 +128,11 @@ const NewSurvey = () => {
                     <div className="input-field col s12">
                         <input id="recipients" {...register("recipients", {
                             required: "Required",
-                            // validate: v => validateEmails(v) || "there are invalid emails",
+                            validate: v => validateEmails(v) || "Email invalid",
+                            // validate: {
+                            //     email: v => validateEmails(v) || 'email invalid',
+                            //     // messages: v => !v && ['recipients']
+                            //   }
                         })}/>
                         <label className="active" htmlFor="recipients">Recipients</label>
                         {<ErrorMessage
