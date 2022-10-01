@@ -88,8 +88,26 @@ module.exports = function surveyRoutes(app) {
         // Parse the Sendgrid event to get relevant information
         const responses = _.chain(req.body).map( ({event, email, url}) => {
             console.log(event);
-            return event === 'click' ? {email, url} : null
+            // check if URL matches the survey URL
+            if (event === 'click') {
+                const path = new Path('/api/surveys/:survey_id/:choice');
+                const urlObj = new URL(url);
+                pathname = urlObj.pathname;
+                if (path.test(pathname)) {
+                    const pathArr = pathname.split('/');
+                    console.log(pathArr);
+                    return [pathArr[2], pathArr[3]];
+                }
+            } 
         })
+        .compact()
+        .forEach( (response) => {
+            console.log(response)
+            }
+            // Run monogo queries here
+            // Find with the email, survey_id and choice
+            // update with choice
+        )
 
 
         // Encode survey_id in the URL so you can parse and idenity which survey user responded to
@@ -111,7 +129,7 @@ module.exports = function surveyRoutes(app) {
     });
 
 
-    app.get('/api/surveys/thanks', (req, res) => {
+    app.get('/api/surveys/:survey_id/:choice', (req, res) => {
         res.send("Thank you for submitting a response!");
     });
 }
