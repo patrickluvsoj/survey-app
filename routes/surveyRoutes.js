@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const SurveySchema = mongoose.model('surveys');
 const express = require('express');
-// const bodyParser = require('body-parser');
 const { URL } = require('url');
 const { Path } = require('path-parser')
 const _ = require('lodash');
@@ -22,16 +21,17 @@ module.exports = function surveyRoutes(app) {
     app.post('/api/surveys', express.json(), requireLogin, requireCredits, async (req, res) => {
 
         const { title, subject, body, from, recipients } = req.body;
-
         // Check if we properly received survey submission data from client
         // console.log('user_id: ' + req.user.id + ', typeof: ' + typeof req.user.id );
+
+        console.log(recipients.split(",").map( email => ({email: email.trim()})));
     
         const survey = await new SurveySchema({
             title: title,
             subject: subject,
             body: body,
             from: from,
-            recipients: recipients.split(",").map(email => ({ email: email.trim() })),
+            recipients: recipients.split(",").map( email => ({email: email.trim()})),
             _user: req.user.id,
             dateSent: Date.now(),
         });
@@ -80,36 +80,51 @@ module.exports = function surveyRoutes(app) {
 
 
     app.post('/api/surveys/webhooks', express.json(), (req, res) => {
-        // console.log(`Received webhook event: ${JSON.stringify(req.body)}`);
-        // UPDATE sendgrid URL after running NGROK
 
-        // Set NGROK to receive sendgrid events
-            // Enable sendgrid events
-        // Parse the Sendgrid event to get relevant information
         const responses = _.chain(req.body).map( ({event, email, url}) => {
             console.log(event);
-            // check if URL matches the survey URL
+            
             if (event === 'click') {
                 const path = new Path('/api/surveys/:survey_id/:choice');
                 const urlObj = new URL(url);
                 pathname = urlObj.pathname;
+
+                // check if URL matches the survey URL
                 if (path.test(pathname)) {
                     const pathArr = pathname.split('/');
                     console.log(pathArr);
-                    return [pathArr[2], pathArr[3]];
+                    return {email: email, survey_id: pathArr[3], choice: pathArr[4]};
                 }
             } 
         })
         .compact()
-        .forEach( (response) => {
-            console.log(response)
-            }
-            // Run monogo queries here
-            // Find with the email, survey_id and choice
-            // update with choice
-        )
+        .uniqBy()
+        .forEach( async ({email, survey_id, choice}) => {
+            const filter = { $and: [
+                    { _id: survey_id },
+                    { recipients: { $elemMatch: { email: email, responded: {$ne: true} } } } ] };
+
+            const update = { 
+                $inc: { [choice]: 1 },
+                $set: { 'recipients.$.responded': true } };
+
+            const results = await SurveySchema.findOneAndUpdate(filter, update);
+
+            console.log(results);
+        })
+
+        res.send(`Received webhook event: ${req.body}`);
+    });
 
 
+    app.get('/api/surveys/:survey_id/:choice', (req, res) => {
+        res.send("Thank you for submitting a response!");
+    });
+}
+
+        // Set NGROK to receive sendgrid events
+            // Enable sendgrid events
+        // Parse the Sendgrid event to get relevant information
         // Encode survey_id in the URL so you can parse and idenity which survey user responded to
         // Filter the event coming from Sendgrid
             // We should return survey_id, email & choice
@@ -122,30 +137,3 @@ module.exports = function surveyRoutes(app) {
                 // then update using $inc, $set
                 // add last responded date lastreponded: new Date()
         // Make sure thank you route is updated
-        console.log(`Received webhook event: ${JSON.stringify(responses)}`);
-
-
-        res.send(`Received webhook event: ${req.body}`);
-    });
-
-
-    app.get('/api/surveys/:survey_id/:choice', (req, res) => {
-        res.send("Thank you for submitting a response!");
-    });
-}
-
-
-
-
-// SENDGRID EVENT STRUCTURE
-// [{"email":"example@test.com","timestamp":1664123380,"smtp-id":"\u003c14c5d75ce93.dfd.64b469@ismtpd-555\u003e","event":"processed","category":["cat facts"],"sg_event_id":"EFlb32iXNb_XmuV29w95PQ==","sg_message_id":"14c5d75ce93.dfd.64b469.filter0001.16648.5515E0B88.0"},
-// {"email":"example@test.com","timestamp":1664123380,"smtp-id":"\u003c14c5d75ce93.dfd.64b469@ismtpd-555\u003e","event":"deferred","category":["cat facts"],"sg_event_id":"BFq3tAKmWmzYLWRTZU5s3A==","sg_message_id":"14c5d75ce93.dfd.64b469.filter0001.16648.5515E0B88.0","response":"400 try again later","attempt":"5"},
-// {"email":"example@test.com","timestamp":1664123380,"smtp-id":"\u003c14c5d75ce93.dfd.64b469@ismtpd-555\u003e","event":"delivered","category":["cat facts"],"sg_event_id":"vC8wJnv4_2PRpRRY9VcZsg==","sg_message_id":"14c5d75ce93.dfd.64b469.filter0001.16648.5515E0B88.0","response":"250 OK"},
-// {"email":"example@test.com","timestamp":1664123380,"smtp-id":"\u003c14c5d75ce93.dfd.64b469@ismtpd-555\u003e","event":"open","category":["cat facts"],"sg_event_id":"6_LJGllWCDMwzfCIlYHKCA==","sg_message_id":"14c5d75ce93.dfd.64b469.filter0001.16648.5515E0B88.0","useragent":"Mozilla/4.0 (compatible; MSIE 6.1; Windows XP; .NET CLR 1.1.4322; .NET CLR 2.0.50727)","ip":"255.255.255.255"},
-// {"email":"example@test.com","timestamp":1664123380,"smtp-id":"\u003c14c5d75ce93.dfd.64b469@ismtpd-555\u003e","event":"click","category":["cat facts"],"sg_event_id":"9g9u5Sk1Hrp-avFieGR2pg==","sg_message_id":"14c5d75ce93.dfd.64b469.filter0001.16648.5515E0B88.0","useragent":"Mozilla/4.0 (compatible; MSIE 6.1; Windows XP; .NET CLR 1.1.4322; .NET CLR 2.0.50727)","ip":"255.255.255.255","url":"http://www.sendgrid.com/"},
-// {"email":"example@test.com","timestamp":1664123380,"smtp-id":"\u003c14c5d75ce93.dfd.64b469@ismtpd-555\u003e","event":"bounce","category":["cat facts"],"sg_event_id":"Qn_R5pH5Z4napfBubqGi7Q==","sg_message_id":"14c5d75ce93.dfd.64b469.filter0001.16648.5515E0B88.0","reason":"500 unknown recipient","status":"5.0.0"},
-// {"email":"example@test.com","timestamp":1664123380,"smtp-id":"\u003c14c5d75ce93.dfd.64b469@ismtpd-555\u003e","event":"dropped","category":["cat facts"],"sg_event_id":"X1ADYFP3kM5id94plECz3w==","sg_message_id":"14c5d75ce93.dfd.64b469.filter0001.16648.5515E0B88.0","reason":"Bounced Address","status":"5.0.0"},
-// {"email":"example@test.com","timestamp":1664123380,"smtp-id":"\u003c14c5d75ce93.dfd.64b469@ismtpd-555\u003e","event":"spamreport","category":["cat facts"],"sg_event_id":"WK_OfaHiqnKFvzFy6vGETw==","sg_message_id":"14c5d75ce93.dfd.64b469.filter0001.16648.5515E0B88.0"},
-// {"email":"example@test.com","timestamp":1664123380,"smtp-id":"\u003c14c5d75ce93.dfd.64b469@ismtpd-555\u003e","event":"unsubscribe","category":["cat facts"],"sg_event_id":"cFDjKZsZIHT2m4aO8IUW3g==","sg_message_id":"14c5d75ce93.dfd.64b469.filter0001.16648.5515E0B88.0"},
-// {"email":"example@test.com","timestamp":1664123380,"smtp-id":"\u003c14c5d75ce93.dfd.64b469@ismtpd-555\u003e","event":"group_unsubscribe","category":["cat facts"],"sg_event_id":"pN-oCBlWxYVTxTGdLDtzgA==","sg_message_id":"14c5d75ce93.dfd.64b469.filter0001.16648.5515E0B88.0","useragent":"Mozilla/4.0 (compatible; MSIE 6.1; Windows XP; .NET CLR 1.1.4322; .NET CLR 2.0.50727)","ip":"255.255.255.255","url":"http://www.sendgrid.com/","asm_group_id":10},
-// {"email":"example@test.com","timestamp":1664123380,"smtp-id":"\u003c14c5d75ce93.dfd.64b469@ismtpd-555\u003e","event":"group_resubscribe","category":["cat facts"],"sg_event_id":"Btihg1bdIDlM1oVGexvRLw==","sg_message_id":"14c5d75ce93.dfd.64b469.filter0001.16648.5515E0B88.0","useragent":"Mozilla/4.0 (compatible; MSIE 6.1; Windows XP; .NET CLR 1.1.4322; .NET CLR 2.0.50727)","ip":"255.255.255.255","url":"http://www.sendgrid.com/","asm_group_id":10}]
