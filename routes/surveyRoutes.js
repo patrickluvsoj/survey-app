@@ -117,6 +117,24 @@ module.exports = function surveyRoutes(app) {
     });
 
 
+    app.get('/api/surveys/list', async (req, res) => {
+        // get the right list of data
+        // creat an Atom
+        // create action to call API
+        // Component that parses data and displays as list
+
+        let current_date = new Date()
+        current_date.setDate( current_date.getDate() - 5 );
+
+        const results = await SurveySchema.find(
+            { dateSent: { $gte: current_date } },
+            { title: 1 }
+        );
+
+        res.send(results);
+    });
+
+
     app.get('/api/surveys/:survey_id/:choice', (req, res) => {
         res.send("Thank you for submitting a response!");
     });
