@@ -6,7 +6,9 @@ export const surveysState = atom({
         title: "",
         subject: "",
         body: "",
-        from: "",
-        recipients: ""
+        yes: 0,
+        no: 0,
+        dateSent: "",
+        lastResponded: ""
     }],
 });

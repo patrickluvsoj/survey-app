@@ -80,9 +80,10 @@ module.exports = function surveyRoutes(app) {
 
 
     app.post('/api/surveys/webhooks', express.json(), (req, res) => {
+        console.log(req.body, typeof(req.body));
 
-        const responses = _.chain(req.body).map( ({event, email, url}) => {
-            console.log(event);
+        _.chain(req.body).map( ({event, email, url}) => {
+            console.log("hello: ", event);
             
             if (event === 'click') {
                 const path = new Path('/api/surveys/:survey_id/:choice');
@@ -106,7 +107,7 @@ module.exports = function surveyRoutes(app) {
 
             const update = { 
                 $inc: { [choice]: 1 },
-                $set: { 'recipients.$.responded': true } };
+                $set: { 'recipients.$.responded': true, lastResponded: new Date()  } };
 
             const results = await SurveySchema.findOneAndUpdate(filter, update);
 
@@ -118,17 +119,12 @@ module.exports = function surveyRoutes(app) {
 
 
     app.get('/api/surveys/list', async (req, res) => {
-        // get the right list of data
-        // creat an Atom
-        // create action to call API
-        // Component that parses data and displays as list
 
         let current_date = new Date()
-        current_date.setDate( current_date.getDate() - 5 );
+        current_date.setDate( current_date.getDate() - 14 );
 
         const results = await SurveySchema.find(
-            { dateSent: { $gte: current_date } },
-            { title: 1 }
+            { dateSent: { $gte: current_date } }
         );
 
         res.send(results);

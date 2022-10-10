@@ -3,33 +3,43 @@ import { surveysState } from "../Atoms/surveysState";
 import { useRecoilState } from "recoil";
 import "./Dashboard.css";
 import { fetchSurveys } from "../Actions/fetchSurveys";
+import { useEffect } from "react";
 
 const Dashboard = () => {
-  // use dummy data for now
-  let surveys = [
-    {title: "first survey"},
-    {title: "second survey"},
-    {title: "third survey"}
-  ];
 
-  fetchSurveys();
+  const [ surveys ] = useRecoilState(surveysState);
 
-  // wire up w/ atom  
-  [ surveys ] = useRecoilState(surveysState);
+  useEffect( () => {
+    fetchSurveys();
+  }, [])
 
   console.log(surveys);
 
-
   const renderList = () => {
-    return surveys.map( survey => <li>{survey.title}</li>);
+    return surveys.map( survey => {
+      return (
+        <li className="collection-item">
+          <div className="title">
+            {survey.title}
+          </div>
+          <p>
+            Subject: {survey.subject} <br></br>
+            Question: {survey.body} <br></br>
+            Sent: {survey.dateSent} <br></br>
+            Last Response: {survey.lastResponded} <br></br>
+            Yes: {survey.yes} / No: {survey.no}
+          </p>
+        </li>
+      )
+    });
 
   }
 
   return (
     <div className="dashboard">
-      <div>
-        List surveys here
-        <ul>
+      <div className="container">
+        <ul className="collection with-header">
+          <li className="collection-header"><h4>Surveys</h4></li>
           {renderList()}
         </ul>
       </div>
