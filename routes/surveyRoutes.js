@@ -82,8 +82,8 @@ module.exports = function surveyRoutes(app) {
     app.post('/api/surveys/webhooks', express.json(), (req, res) => {
         console.log(req.body, typeof(req.body));
 
-        _.chain(req.body).map( ({event, email, url}) => {
-            console.log("hello: ", event);
+        const response = _.chain(req.body).map( ({event, email, url}) => {
+            console.log(event);
             
             if (event === 'click') {
                 const path = new Path('/api/surveys/:survey_id/:choice');
