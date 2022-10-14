@@ -3,36 +3,20 @@ import Header from "./Header";
 import NewSurvey from "./NewSurvey";
 import Dashboard from "./Dashboard";
 import Homepage from "./Homepage";
-// import { useEffect } from "react";
 import { fetchUser } from "../Actions/fetchUser";
 
-// import io from "socket.io-client";
-
-// temporary for testing survey routes and sendgrid emails
-import axios from "axios";
-window.axios = axios;
-
-// need to update this for PROD
-// const ENDPOINT = "http://localhost:5000";
+// for testing express api routes
+// import axios from "axios";
+// window.axios = axios;
 
 function App() {
 
   const isAuthenticated = fetchUser();
 
-  // useEffect(() => {
-  //   const socket = io(ENDPOINT, {
-  //     withCredentials: true,
-  //   });
-  //   socket.onAny((event, ...args) => {
-  //     console.log(event, args);
-  //   });
-  // }, []);
-
   const AuthWrapper = ({isAuthenticated}) => {
 
     return isAuthenticated ? 
-    <Navigate to="/dashboard" replace /> :
-     <Navigate to="/homepage" replace />
+    <Navigate to="/dashboard" replace /> : <Navigate to="/homepage" replace />
 
   };
 

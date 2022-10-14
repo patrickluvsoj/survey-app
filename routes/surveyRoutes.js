@@ -17,11 +17,10 @@ const surveyTemplate = require('../templates/surveyTemplate');
 // reference following sendgrid documentation: https://github.com/sendgrid/sendgrid-nodejs/blob/main/docs/use-cases/single-email-multiple-recipients.md
 module.exports = function surveyRoutes(app) {
     
-    // require credits and login to make post request
     app.post('/api/surveys', express.json(), requireLogin, requireCredits, async (req, res) => {
 
         const { title, subject, body, from, recipients } = req.body;
-        // Check if we properly received survey submission data from client
+        // Log to check if we properly received survey submission data from client
         // console.log('user_id: ' + req.user.id + ', typeof: ' + typeof req.user.id );
 
         console.log(recipients.split(",").map( email => ({email: email.trim()})));
@@ -36,7 +35,7 @@ module.exports = function surveyRoutes(app) {
             dateSent: Date.now(),
         });
 
-        // Check if email have been parsed properly
+        // Log to check if email have been parsed properly
         // const test_recipients = survey.recipients.map( recipient => recipient.email )
         // console.log('recipients: ' + test_recipients + ', typeof: ' + typeof test_recipients);
         
@@ -80,7 +79,8 @@ module.exports = function surveyRoutes(app) {
 
 
     app.post('/api/surveys/webhooks', express.json(), (req, res) => {
-        console.log(req.body);
+        // Log to check webhook event data being received
+        // console.log(req.body);
 
         const response = req.body.map( ({event, email, url}) => {
             if (event === 'click') {
@@ -90,8 +90,8 @@ module.exports = function surveyRoutes(app) {
 
                 // check if URL matches the survey URL
                 if (path.test(pathname)) {
+                    // get survey_id and user response yes/no from url parameters
                     const pathArr = pathname.split('/');
-                    console.log(pathArr);
                     return {email: email, survey_id: pathArr[3], choice: pathArr[4]};
                 }
             } 
@@ -110,40 +110,6 @@ module.exports = function surveyRoutes(app) {
 
             console.log(results);
         })
-
-        console.log(response);
-
-        // const response = _.chain(req.body).map( ({event, email, url}) => {
-        //     console.log(event, email);
-            
-        //     if (event === 'click') {
-        //         const path = new Path('/api/surveys/:survey_id/:choice');
-        //         const urlObj = new URL(url);
-        //         const pathname = urlObj.pathname;
-
-        //         // check if URL matches the survey URL
-        //         if (path.test(pathname)) {
-        //             const pathArr = pathname.split('/');
-        //             console.log(pathArr);
-        //             return {email: email, survey_id: pathArr[3], choice: pathArr[4]};
-        //         }
-        //     } 
-        // })
-        // .compact()
-        // .uniqBy()
-        // .forEach( async ({email, survey_id, choice}) => {
-        //     const filter = { $and: [
-        //             { _id: survey_id },
-        //             { recipients: { $elemMatch: { email: email, responded: {$ne: true} } } } ] };
-
-        //     const update = { 
-        //         $inc: { [choice]: 1 },
-        //         $set: { 'recipients.$.responded': true, lastResponded: new Date()  } };
-
-        //     const results = await SurveySchema.findOneAndUpdate(filter, update);
-
-        //     console.log(results);
-        // })
 
         res.send(`Received webhook event: ${req.body}`);
     });
@@ -167,18 +133,19 @@ module.exports = function surveyRoutes(app) {
     });
 }
 
-        // Set NGROK to receive sendgrid events
-            // Enable sendgrid events
-        // Parse the Sendgrid event to get relevant information
-        // Encode survey_id in the URL so you can parse and idenity which survey user responded to
-        // Filter the event coming from Sendgrid
-            // We should return survey_id, email & choice
-                // Remove any ones that are not click events
-                // Remove undefined events
-                // use url, lodash & Parse libraries => use chain function
-        // Save the events in MongoDB
-            // Do all search and update in a query
-                // First find the right user using survey_id, email & choice
-                // then update using $inc, $set
-                // add last responded date lastreponded: new Date()
-        // Make sure thank you route is updated
+// TODO
+// Set NGROK to receive sendgrid events
+    // Enable sendgrid events
+// Parse the Sendgrid event to get relevant information
+// Encode survey_id in the URL so you can parse and idenity which survey user responded to
+// Filter the event coming from Sendgrid
+    // We should return survey_id, email & choice
+        // Remove any ones that are not click events
+        // Remove undefined events
+        // use url, lodash & Parse libraries => use chain function
+// Save the events in MongoDB
+    // Do all search and update in a query
+        // First find the right user using survey_id, email & choice
+        // then update using $inc, $set
+        // add last responded date lastreponded: new Date()
+// Make sure thank you route is updated

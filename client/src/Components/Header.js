@@ -35,7 +35,6 @@ function Header() {
         return message ? <Message message={message} /> : <Payment />
     }
 
-
     const renderMenu = () => {
         if (user) { 
             return [

@@ -5,7 +5,7 @@ const key = require('../config/keys')
 const mongoose = require('mongoose')
 const UserSchema = mongoose.model('users')
 
-// Reference this to understand serialize & deserialize
+// References to understand serialize & deserialize in passport
 // https://stackoverflow.com/questions/29066348/passportjs-serializeuser-and-deserializeuser-execution-flow
 // https://dev.to/samippoudel/google-oauth-using-typescript-expressjs-passportjs-mongodb-5el8
 
@@ -16,7 +16,7 @@ passport.serializeUser( (user, done) => {
     done(null, user.id)
 })
 
-// take cookie that user gives us and deserialize to a user model in Mongo
+// take cookie that user provide and deserialize to a user model in Mongo
 passport.deserializeUser( async (id, done) => {
     console.log('de-serialize cookie')
     if (mongoose.Types.ObjectId.isValid(id)) {
@@ -32,16 +32,18 @@ passport.use(
         callbackURL: '/auth/google/redirect',
         proxy: true,
     }, async (accessToken, refreshToken, profile, done) => {
-        console.log('handle auth request')
+        // Logs to check info passed from Google auth
+        // console.log('handle auth request')
         // console.log('refresh token: ' + refreshToken)
         // console.log('access token: ' + accessToken)
         // console.log('profile: ' + profile)
         // console.log(`profile id: ${profile.id}`) 
 
-        // Logic if user is new or existing
+        // Logic ckecing if user is new or existing
         const existingUser = await UserSchema.findOne({ user_id: profile.id })
-        console.log('checked for existing user')
+        
         if (existingUser) {
+            console.log('existing user')
             return done(null, existingUser)
         }
 

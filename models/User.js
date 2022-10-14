@@ -7,5 +7,4 @@ const UserSchema = new Schema({
     credits: {type: Number, default: 0}
 });
 
-//Export model
 mongoose.model('users', UserSchema);

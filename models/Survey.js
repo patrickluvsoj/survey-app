@@ -16,5 +16,4 @@ const SurveySchema = new Schema({
     lastResponded: Date,
 });
 
-//Export model
 mongoose.model('surveys', SurveySchema);

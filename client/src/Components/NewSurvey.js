@@ -35,12 +35,12 @@ const NewSurvey = () => {
     }
 
     useEffect(() => {
-        console.log("form state in use effect before watch triggers : ", form);
+        // console.log("form state in use effect before watch triggers : ", form);
 
         const subscription = watch((value, { name, type }) => {
-            console.log("watch triggerd: ", value);
+            // console.log("watch triggerd: ", value);
             setForm(value);
-            console.log("form state in Recoil: ", form);
+            // console.log("form state in Recoil: ", form);
         });
         return () => subscription.unsubscribe();
     }, [watch, form]);
@@ -57,16 +57,16 @@ const NewSurvey = () => {
                 from: "",
                 recipients: "",
             });
-            console.log("recoild setForm called", form);
+            // console.log("recoild setForm called", form);
             
             localStorage.clear();
-            console.log("local storage cleared: ", localStorage.getItem('form'));
+            // console.log("local storage cleared: ", localStorage.getItem('form'));
 
             reset();
-            console.log("form field reset called", getValues());
+            // console.log("form field reset called", getValues());
             
             setReview(false);
-            console.log("setReview to false", localStorage.getItem('preview'));
+            // console.log("setReview to false", localStorage.getItem('preview'));
 
             navigate("/dashboard");
         } catch(error) {
@@ -129,10 +129,6 @@ const NewSurvey = () => {
                         <input id="recipients" {...register("recipients", {
                             required: "Required",
                             validate: v => validateEmails(v) || "Email invalid",
-                            // validate: {
-                            //     email: v => validateEmails(v) || 'email invalid',
-                            //     // messages: v => !v && ['recipients']
-                            //   }
                         })}/>
                         <label className="active" htmlFor="recipients">Recipients</label>
                         {<ErrorMessage

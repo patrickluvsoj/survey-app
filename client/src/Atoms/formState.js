@@ -1,5 +1,4 @@
 import { atom } from 'recoil';
-import { localStorageEffect } from '../utils/localStorageEffects';
 
 export const formState = atom({
     key: 'formState',
@@ -10,7 +9,4 @@ export const formState = atom({
         from: "",
         recipients: ""
     },
-    // effects: [
-    //     localStorageEffect('form'),
-    // ]
 });
