@@ -53,7 +53,7 @@ module.exports = function surveyRoutes(app) {
                 },
             },
         };
-                
+        
         sgMail.sendMultiple(msg).then(async () => {
             try {
                 await survey.save();
@@ -80,15 +80,13 @@ module.exports = function surveyRoutes(app) {
 
 
     app.post('/api/surveys/webhooks', express.json(), (req, res) => {
-        console.log(req.body, typeof(req.body));
+        console.log(req.body);
 
-        const response = _.chain(req.body).map( ({event, email, url}) => {
-            console.log(event);
-            
+        const response = req.body.map( ({event, email, url}) => {
             if (event === 'click') {
                 const path = new Path('/api/surveys/:survey_id/:choice');
                 const urlObj = new URL(url);
-                pathname = urlObj.pathname;
+                const pathname = urlObj.pathname;
 
                 // check if URL matches the survey URL
                 if (path.test(pathname)) {
@@ -98,8 +96,7 @@ module.exports = function surveyRoutes(app) {
                 }
             } 
         })
-        .compact()
-        .uniqBy()
+        .filter( obj => obj !== undefined) // .uniqBy()
         .forEach( async ({email, survey_id, choice}) => {
             const filter = { $and: [
                     { _id: survey_id },
@@ -113,6 +110,40 @@ module.exports = function surveyRoutes(app) {
 
             console.log(results);
         })
+
+        console.log(response);
+
+        // const response = _.chain(req.body).map( ({event, email, url}) => {
+        //     console.log(event, email);
+            
+        //     if (event === 'click') {
+        //         const path = new Path('/api/surveys/:survey_id/:choice');
+        //         const urlObj = new URL(url);
+        //         const pathname = urlObj.pathname;
+
+        //         // check if URL matches the survey URL
+        //         if (path.test(pathname)) {
+        //             const pathArr = pathname.split('/');
+        //             console.log(pathArr);
+        //             return {email: email, survey_id: pathArr[3], choice: pathArr[4]};
+        //         }
+        //     } 
+        // })
+        // .compact()
+        // .uniqBy()
+        // .forEach( async ({email, survey_id, choice}) => {
+        //     const filter = { $and: [
+        //             { _id: survey_id },
+        //             { recipients: { $elemMatch: { email: email, responded: {$ne: true} } } } ] };
+
+        //     const update = { 
+        //         $inc: { [choice]: 1 },
+        //         $set: { 'recipients.$.responded': true, lastResponded: new Date()  } };
+
+        //     const results = await SurveySchema.findOneAndUpdate(filter, update);
+
+        //     console.log(results);
+        // })
 
         res.send(`Received webhook event: ${req.body}`);
     });

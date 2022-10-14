@@ -11,16 +11,33 @@ const Dashboard = () => {
 
   useEffect( () => {
     fetchSurveys();
-  }, [])
+  }, []);
 
   console.log(surveys);
 
   const renderList = () => {
-    return surveys.map( survey => {
+    const sortedDates = [];
+    const prevDate = undefined;
+    
+    //sort the list of surveys based on date sent
+    surveys.forEach( obj => {
+      if (obj.dateSent !== prevDate) {
+        sortedDates.unshift(obj)
+      }
+      else if (obj.dateSent < prevDate) {
+        sortedDates.unshift(obj)
+      } else {
+        sortedDates.append(obj)
+      }
+    });
+
+    console.log(sortedDates);
+
+    return sortedDates.map( survey => {
       return (
         <li className="collection-item">
           <div className="title">
-            {survey.title}
+            <h5>{survey.title}</h5>
           </div>
           <p>
             Subject: {survey.subject} <br></br>
@@ -38,8 +55,9 @@ const Dashboard = () => {
   return (
     <div className="dashboard">
       <div className="container">
+        {/* <h4>Surveys</h4> */}
         <ul className="collection with-header">
-          <li className="collection-header"><h4>Surveys</h4></li>
+          {/* <li className="collection-header"></li> */}
           {renderList()}
         </ul>
       </div>
