@@ -13,7 +13,8 @@ const Dashboard = () => {
     fetchSurveys();
   }, []);
 
-  console.log(surveys);
+  // Validate if surveys were properly fetched
+  // console.log(surveys);
 
   const renderList = () => {
     const sortedDates = [];
@@ -31,8 +32,6 @@ const Dashboard = () => {
       }
     });
 
-    console.log(sortedDates);
-
     return sortedDates.map( survey => {
       return (
         <li className="collection-item">
@@ -49,15 +48,13 @@ const Dashboard = () => {
         </li>
       )
     });
-
   }
 
   return (
     <div className="dashboard">
       <div className="container">
-        {/* <h4>Surveys</h4> */}
+        <h4>Surveys</h4>
         <ul className="collection with-header">
-          {/* <li className="collection-header"></li> */}
           {renderList()}
         </ul>
       </div>
