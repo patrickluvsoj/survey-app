@@ -115,11 +115,15 @@ module.exports = function surveyRoutes(app) {
     });
 
 
+    // require login
     app.get('/api/surveys/list', async (req, res) => {
 
         let current_date = new Date()
         current_date.setDate( current_date.getDate() - 14 );
 
+        // Make sure only surveys from specific user is queried
+        // Make sure it doesn't query all recipeints
+            // Specify the fields to return
         const results = await SurveySchema.find(
             { dateSent: { $gte: current_date } }
         );
