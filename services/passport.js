@@ -30,20 +30,21 @@ passport.use(
         clientID: key.GOOGLE_CLIENT,
         clientSecret: key.GOOGLE_SECRET,
         callbackURL: '/auth/google/redirect',
+        passReqToCallback: true,
         proxy: true,
-    }, async (accessToken, refreshToken, profile, done) => {
+    }, async (req, accessToken, refreshToken, profile, done) => {
         // Logs to check info passed from Google auth
         // console.log('handle auth request')
         // console.log('refresh token: ' + refreshToken)
         // console.log('access token: ' + accessToken)
-        // console.log('profile: ' + profile)
-        // console.log(`profile id: ${profile.id}`) 
+        console.log('profile: ' + JSON.stringify(profile));
+        // console.log('req: ' + req);
 
         // Logic ckecing if user is new or existing
         const existingUser = await UserSchema.findOne({ user_id: profile.id })
         
         if (existingUser) {
-            console.log('existing user')
+            console.log(`existing user: ${existingUser}`)
             return done(null, existingUser)
         }
 

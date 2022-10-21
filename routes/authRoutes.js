@@ -8,12 +8,12 @@ module.exports = function authRoutes(app) {
     app.get('/auth/google/redirect', passport.authenticate('google', {
         failureRedirect: '/failed',
     }), (req, res) => {
-        res.redirect('/')
+        res.redirect('/surveys');
     })
 
-    app.get('/logout', (req, res) => {
+    app.get('/api/logout', (req, res) => {
         req.logout()
-        res.redirect('/')
+        res.redirect('/');
     })
 
     app.get('/failed', (req, res) => {

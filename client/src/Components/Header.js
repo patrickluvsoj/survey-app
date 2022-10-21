@@ -15,6 +15,7 @@ const Message = ({ message }) => (
 function Header() {
     // Check if user is logged in to decide on what content to show
     const [ user ] = useRecoilState(userState);
+    console.log('user state in header: ' + JSON.stringify(user));
 
     const [message, setMessage] = useState("")
 
@@ -44,7 +45,7 @@ function Header() {
                 <li key="credits">
                     {`Credits: ${user.credits}`}
                 </li>,
-                <li key="logout"><a href="/logout">Logout</a></li>
+                <li key="logout"><a href="/api/logout">Logout</a></li>
             ];
         } else {
             return <li><a href="/auth/google">Login</a></li>;

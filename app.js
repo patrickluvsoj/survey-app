@@ -20,6 +20,7 @@ const sessionMiddleware = cookie_session({
   secret: true
 })
 
+// app.use(express.json());
 app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
@@ -52,6 +53,19 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+// TODO
+// - [ ] Review videos on Udemy
+// - [ ] Fix routing so that when logged out, you only see homepage
+// - [ ] Some auth issues and auth redirect screens?
+// - [ ] Better styling for the review survey component
+// - [ ] Improve date format and overall design in the survey list
+// - [ ] Improve the email design/format for the template
+// - [ ] Check if app can be deployed
+// - [ ] Update URL in Sendgrid and Stripe
+// - [ ] Improve spacing between Buy button and Credits
+// - [ ] Be able to filter to unique users responding to survey in the survey_routes
+
+
 
 // TODO
 // Create a user model with id, email and cookie
@@ -62,4 +76,5 @@ if (process.env.NODE_ENV === 'production') {
 // DONE - Setup routes for handling auth
 // DONE - Add the required middleware to setup auth
 // DONE - Have some kind of function to handle authentication
+
 

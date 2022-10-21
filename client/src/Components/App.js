@@ -1,9 +1,12 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, redirect } from "react-router-dom";
 import Header from "./Header";
 import NewSurvey from "./NewSurvey";
 import Dashboard from "./Dashboard";
 import Homepage from "./Homepage";
 import { fetchUser } from "../Actions/fetchUser";
+import { useRecoilValue } from "recoil";
+import { userState } from "../Atoms/userState";
+import { useEffect } from "react";
 
 // for testing express api routes
 // import axios from "axios";
@@ -11,34 +14,28 @@ import { fetchUser } from "../Actions/fetchUser";
 
 function App() {
 
-  const isAuthenticated = fetchUser();
+  let isAuthenticated = null;
 
-  const AuthWrapper = ({isAuthenticated}) => {
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
-    return isAuthenticated ? 
-    <Navigate to="/dashboard" replace /> : <Navigate to="/homepage" replace />
-
-  };
+  isAuthenticated = useRecoilValue(userState);
+  console.log('recoil state is: ' + JSON.stringify(isAuthenticated));
 
   return (
     <div className="App">
+      <Header />
       <Routes>
-        <Route path='/' element={<Header />}>
-          <Route
-            path="/"
-            element={<AuthWrapper isAuthenticated={isAuthenticated} />}
-          />
-          <Route path='/dashboard' element={<Dashboard />}/>
-          <Route path='/homepage' element={<Homepage />}/>
-          <Route path='/newsurvey' element={<NewSurvey />}/>
-        </Route>
+        <Route path="/" element={<Homepage />}/>
+        <Route path='/surveys' element={<Dashboard/>}/>
+        <Route path='/newsurvey' element={<NewSurvey />}/>
       </Routes>
     </div>
   );
 };
 
 export default App;
-
 
 
 

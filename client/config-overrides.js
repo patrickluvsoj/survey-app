@@ -14,6 +14,8 @@ module.exports = function override(config) {
       "url": require.resolve("url"),
       "fs": require.resolve("fs"),
       "child_process": require.resolve("child_process"),
+      "async_hooks": require.resolve("async_hooks"),
+      "net": require.resolve("net"),
       }) 
    config.resolve.fallback = fallback; 
    config.plugins = (config.plugins || []).concat([ 

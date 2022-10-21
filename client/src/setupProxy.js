@@ -8,12 +8,8 @@ const proxy = {
 module.exports = function(app) {
   app.use(
     [
-      '/auth/google', 
-      '/api/current_user', 
-      '/api/checkout', 
-      '/api/surveys', 
-      '/api/surveys/list', 
-      '/logout'
+      '/auth/google',
+      '/api'
     ],
     createProxyMiddleware(proxy)
   );
