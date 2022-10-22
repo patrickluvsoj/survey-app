@@ -37,7 +37,7 @@ passport.use(
         // console.log('handle auth request')
         // console.log('refresh token: ' + refreshToken)
         // console.log('access token: ' + accessToken)
-        console.log('profile: ' + JSON.stringify(profile));
+        // console.log('profile: ' + JSON.stringify(profile));
         // console.log('req: ' + req);
 
         // Logic ckecing if user is new or existing
