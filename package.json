@@ -30,6 +30,7 @@
     "express": "^4.17.3",
     "http-proxy-middleware": "^2.0.6",
     "lodash": "^4.17.21",
+    "mongodb": "^4.11.0",
     "mongoose": "^6.2.10",
     "passport": "^0.5.2",
     "passport-google-oauth20": "^2.0.0",
