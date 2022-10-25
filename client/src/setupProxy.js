@@ -14,11 +14,7 @@ if (process.env.NODE_ENV === 'production') {
 } else {
   console.log('setting HPM')
   module.exports = function(app) {
-    app.use(
-      [
-        '/auth/google',
-        '/api'
-      ],
+    app.use(['/auth/google', '/api'],
       createProxyMiddleware(proxy)
     );
   };
