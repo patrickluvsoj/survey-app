@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { submitSurvey } from "../Actions/submitSurvey";
 import { formState } from "../Atoms/formState";
+import { userState } from "../Atoms/userState";
 import { previewState } from "../Atoms/previewState";
 import { regex } from "../utils/regex";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { ErrorMessage } from "@hookform/error-message";
 import { validateEmails } from "../utils/validateEmails";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +17,7 @@ import ReviewSurvey from "./ReviewSurvey";
 const NewSurvey = () => {
     const [review, setReview] = useRecoilState(previewState);
     const [form, setForm] = useRecoilState(formState);
+    const isAuthenticated = useRecoilValue(userState);
     const navigate = useNavigate();
 
     console.log("form state when initial component load", form);
@@ -152,14 +154,29 @@ const NewSurvey = () => {
     }
 
 
-    return (
-        <div className="container">
-            {review ? 
+    const renderComponent = () => {
+        if (isAuthenticated === null) {
+          return (
+            <div>Loading...</div>
+          )
+        } else if (isAuthenticated === false) {
+          return <Navigate to="/" replace={true} />
+        } else {
+          return (
+            review ? 
                 <ReviewSurvey
                     formValues={form} 
                     handleBackClick={() => handleBackClick}
                     handleSubmitClick={() => handleSubmitClick}
-                /> : editForm}
+                /> : editForm
+          )
+        }
+      }
+
+
+    return (
+        <div className="container">
+            {renderComponent()}
         </div>
     )
 }
