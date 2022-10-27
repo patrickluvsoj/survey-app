@@ -17,26 +17,17 @@ const Dashboard = () => {
   }, []);
 
   // Validate if surveys were properly fetched
-  // console.log(surveys);
+  console.log(surveys);
+
+  const formatDate = (surveyDate) => {
+    const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+    const date = new Date(surveyDate);
+
+    return date.toLocaleDateString(undefined, options);
+  }
 
   const renderList = () => {
-    const sortedDates = [];
-    const prevDate = undefined;
-    
-    //sort the list of surveys based on date sent
-    surveys.forEach( obj => {
-      if (obj.dateSent !== prevDate) {
-        sortedDates.unshift(obj)
-      }
-      else if (obj.dateSent < prevDate) {
-        sortedDates.unshift(obj)
-      } else {
-        sortedDates.append(obj)
-      }
-    });
-
-    return sortedDates.map( survey => {
-      console.log(survey._id);
+    return surveys.map( survey => { 
       return (
         <li key={survey._id} className="collection-item">
           <div className="title">
@@ -45,8 +36,8 @@ const Dashboard = () => {
           <p>
             Subject: {survey.subject} <br></br>
             Question: {survey.body} <br></br>
-            Sent: {survey.dateSent} <br></br>
-            Last Response: {survey.lastResponded} <br></br>
+            Sent: {formatDate(survey.dateSent)}<br></br>
+            Last Response: {formatDate(survey.lastResponded)}<br></br>
             Yes: {survey.yes} / No: {survey.no}
           </p>
         </li>

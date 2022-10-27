@@ -125,8 +125,8 @@ module.exports = function surveyRoutes(app) {
         // Make sure it doesn't query all recipeints
             // Specify the fields to return
         const results = await SurveySchema.find(
-            { dateSent: { $gte: current_date } }
-        );
+            { _user: req.user},
+        ).sort( {dateSent: -1} ).limit(6);
 
         res.send(results);
     });
